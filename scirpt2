@@ -1,120 +1,236 @@
-import time
 import os
+import time
 import random
 import webbrowser
+import tkinter as tk
+from tkinter import messagebox
 
-# ===== COLORES =====
-RESET = "\033[0m"
-BOLD = "\033[1m"
-CYAN = "\033[96m"
-MAGENTA = "\033[95m"
-BLUE = "\033[94m"
-GREEN = "\033[92m"
-RED = "\033[91m"
+# Intentar cargar flask (si no existe, no rompe el script)
+try:
+    from flask import Flask
+    FLASK_OK = True
+except:
+    FLASK_OK = False
 
-# ===== LIMPIAR PANTALLA =====
+
+# ================================================================
+# ==================== EFECTOS FUTURISTAS ========================
+# ================================================================
+
+RESET="\033[0m"; CYAN="\033[96m"; MAGENTA="\033[95m"; BLUE="\033[94m"
+GREEN="\033[92m"; RED="\033[91m"; BOLD="\033[1m"
+
 def clear():
     os.system("cls" if os.name == "nt" else "clear")
 
-# ===== EFECTO GLITCH DIGITAL =====
-def glitch(texto):
-    chars = list(texto)
-    for _ in range(8):
-        corrupto = "".join(
+def glitch(text):
+    """Efecto glitch digital"""
+    for _ in range(7):
+        g = "".join(
             c if random.random() > 0.15 else random.choice("@#$%&/+=*")
-            for c in chars
+            for c in text
         )
-        print(MAGENTA + corrupto + RESET, end="\r")
+        print(MAGENTA + g + RESET, end="\r")
         time.sleep(0.05)
-    print(CYAN + texto + RESET)
+    print(CYAN + text + RESET)
 
-# ===== ANIMACIÓN HOLOGRAMA =====
-def animacion_titulo():
+# ================================================================
+# =============== TÍTULO ANIMADO FUTURISTA ========================
+# ================================================================
+
+def titulo_animado():
     clear()
     titulo = "SPINELLY HUB"
+    print(BLUE + "Inicializando holograma..." + RESET)
+    time.sleep(0.5)
 
-    print("\n\n")
-    print(BLUE + "    Inicializando Holograma..." + RESET)
-    time.sleep(0.7)
+    # Efecto de encendido
+    for i in range(1, 6):
+        print(CYAN + ("▮" * i).ljust(12) + RESET, end="\r")
+        time.sleep(0.12)
 
-    for i in range(3):
-        print(BLUE + "    Generando Partículas ▮" + "▮" * i + RESET)
-        time.sleep(0.3)
+    print()
+    time.sleep(0.2)
 
-    print("\n      ", end="")
-    glitch(titulo)
-    print("\n")
+    # Glitch + aparición progresiva
+    mostrado = ""
+    for letra in titulo:
+        mostrado += letra
+        glitch_text = "".join(
+            c if random.random() > 0.25 else random.choice("@#$%&/+=*")
+            for c in mostrado
+        )
+        print(MAGENTA + glitch_text + RESET, end="\r")
+        time.sleep(0.07)
+
+    print(CYAN + BOLD + titulo + RESET)
+    print()
     time.sleep(0.4)
 
-# ===== EFECTO DE CARGA FUTURISTA =====
-def carga(texto="Cargando"):
-    print(MAGENTA + texto + "…" + RESET)
-    for i in range(20):
-        bar = "▮" * i
-        print(CYAN + "[" + bar.ljust(20) + "]" + RESET, end="\r")
-        time.sleep(0.05)
+
+# ================================================================
+# ===================== MODOS TERMINAL ===========================
+# ================================================================
+
+def carga(msg="Cargando"):
+    print(MAGENTA + msg + RESET)
+    for i in range(25):
+        print(CYAN + "[" + "▮"*i + " "*(25-i) + "]" + RESET, end="\r")
+        time.sleep(0.03)
     print()
 
-# ===== LOGO DISCORD (FIJO) =====
-def discord_icon():
-    print(BLUE + "🟦 Discord: presiona [D]" + RESET)
+def terminal_modulo(name):
+    titulo_animado()
+    carga(f"Iniciando {name}")
+    print(GREEN + f"\n{name} listo.\n" + RESET)
+    input("Presiona Enter para volver...")
 
-# ===== PANTALLAS OPCIONALES =====
-def pantalla_generica(nombre):
-    clear()
-    animacion_titulo()
-    titulo = f"— {nombre} —"
-    glitch(titulo)
-    carga(f"Inicializando {nombre}")
-    print(GREEN + f"\n{nombre} está listo.\n" + RESET)
-    input("Presiona Enter para volver al menú...")
-
-# ===== MENÚ PRINCIPAL =====
-def menu():
+def terminal_menu():
     while True:
-        clear()
-        animacion_titulo()
-
+        titulo_animado()
         print(f"""
-{MAGENTA}{BOLD}╔════════════════════════════════════════╗
-║           ⚡ MENÚ PRINCIPAL ⚡           ║
-╠════════════════════════════════════════╣{RESET}
+{CYAN}{BOLD}MODOS DISPONIBLES (Terminal){RESET}
 
-   {CYAN}[1]{RESET} Main
-   {CYAN}[2]{RESET} PvP
-   {CYAN}[3]{RESET} Laser Lagger
-   {CYAN}[4]{RESET} ZZZ
+1) Main
+2) PvP
+3) Laser Lagger
+4) ZZZ
 
-   {BLUE}[D]{RESET} Conectar a Discord
-   {RED}[X]{RESET} Salir
+D) Discord
+X) Volver
 """)
-        discord_icon()
-        print()
 
-        opcion = input("Selecciona una opción: ").strip().lower()
+        op = input("Selecciona: ").lower()
 
-        if opcion == "1":
-            pantalla_generica("MAIN")
-        elif opcion == "2":
-            pantalla_generica("PvP MODE")
-        elif opcion == "3":
-            pantalla_generica("LASER LAGGER")
-        elif opcion == "4":
-            pantalla_generica("ZZZ MODE")
-        elif opcion == "d":
-            print(BLUE + "Abriendo Discord…" + RESET)
-            webbrowser.open("https://discord.gg/")  # <-- pon tu link
-            time.sleep(1.5)
-        elif opcion == "x":
+        if op == "1":
+            terminal_modulo("MAIN")
+        elif op == "2":
+            terminal_modulo("PVP MODE")
+        elif op == "3":
+            terminal_modulo("LASER LAGGER")
+        elif op == "4":
+            terminal_modulo("ZZZ MODE")
+        elif op == "d":
+            webbrowser.open("https://discord.gg/")
+        elif op == "x":
+            return
+
+
+# ================================================================
+# ======================= MODO MATRIX ============================
+# ================================================================
+
+def matrix_mode():
+    clear()
+    chars="01"
+    print(GREEN + "Modo Matrix — CTRL+C para salir" + RESET)
+    try:
+        while True:
+            print("".join(random.choice(chars) for _ in range(150)))
+            time.sleep(0.02)
+    except KeyboardInterrupt:
+        clear()
+
+
+# ================================================================
+# =========================== GUI ================================
+# ================================================================
+
+def gui_mode():
+    root = tk.Tk()
+    root.title("Spinelly Hub")
+    root.geometry("400x500")
+    root.configure(bg="#0a0a0a")
+
+    tk.Label(root, text="SPINELLY HUB",
+             fg="#7df9ff", bg="#0a0a0a",
+             font=("Consolas", 22, "bold")).pack(pady=20)
+
+    def popup(name):
+        messagebox.showinfo("Spinelly Hub", f"Entrando a {name}")
+
+    tk.Button(root, text="Main", width=20, height=2,
+              command=lambda: popup("Main")).pack(pady=10)
+    tk.Button(root, text="PvP", width=20, height=2,
+              command=lambda: popup("PvP")).pack(pady=10)
+    tk.Button(root, text="Laser Lagger", width=20, height=2,
+              command=lambda: popup("Laser Lagger")).pack(pady=10)
+    tk.Button(root, text="ZZZ", width=20, height=2,
+              command=lambda: popup("ZZZ")).pack(pady=10)
+
+    tk.Button(root, text="Discord", width=20, height=2,
+              bg="#5865F2", fg="white",
+              command=lambda: webbrowser.open("https://discord.gg/")).pack(pady=15)
+
+    root.mainloop()
+
+
+# ================================================================
+# ============================ WEB ===============================
+# ================================================================
+
+def web_mode():
+    if not FLASK_OK:
+        print("⚠ Flask no está instalado. Instálalo con: pip install flask")
+        time.sleep(2)
+        return
+
+    app = Flask(__name__)
+
+    @app.route("/")
+    def home():
+        return """
+        <html>
+        <body style='background:black;color:#7df9ff;font-family:Consolas;text-align:center;'>
+            <h1>SPINELLY HUB — WEB</h1>
+            <button onclick="alert('Main')" style="padding:10px;margin:10px;">Main</button>
+            <button onclick="alert('PvP')" style="padding:10px;margin:10px;">PvP</button>
+            <br><br>
+            <a href="https://discord.gg/" style="color:#5865F2;">Discord</a>
+        </body>
+        </html>
+        """
+
+    print("Iniciando servidor en http://127.0.0.1:5000 ...")
+    app.run(port=5000)
+
+
+# ================================================================
+# ========================= MENÚ GLOBAL ==========================
+# ================================================================
+
+def main_menu():
+    while True:
+        titulo_animado()
+        print(f"""
+{MAGENTA}SPINELLY HUB — ULTRA SCRIPT{RESET}
+
+1) Terminal futurista
+2) GUI (ventana)
+3) Web App
+4) Modo Matrix
+D) Discord
+X) Salir
+""")
+
+        op = input("Selecciona: ").lower()
+
+        if op == "1":
+            terminal_menu()
+        elif op == "2":
+            gui_mode()
+        elif op == "3":
+            web_mode()
+        elif op == "4":
+            matrix_mode()
+        elif op == "d":
+            webbrowser.open("https://discord.gg/")
+        elif op == "x":
             clear()
             glitch("Cerrando Spinelly Hub...")
             time.sleep(1)
             break
-        else:
-            print(RED + "❌ Opción no válida" + RESET)
-            time.sleep(1)
 
-# ===== EJECUCIÓN =====
+
 if __name__ == "__main__":
-    animacion_titulo()
-    menu()
+    main_menu()
