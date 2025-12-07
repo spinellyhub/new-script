@@ -1,11 +1,11 @@
--- SPINELLY HUB 4.0 — LUA ULTRA FUTURISTA
--- Con sonido holográfico, transiciones y panel lateral
+-- SPINELLY HUB LUA PURA — FUNCIONAL EN XENO
+-- 100% Roblox Lua
 
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
 
--- Limpia GUI previo
+-- Limpiar GUI previa
 if PlayerGui:FindFirstChild("SpinellyHub") then
 	PlayerGui.SpinellyHub:Destroy()
 end
@@ -13,12 +13,11 @@ end
 -- Crear ScreenGui
 local gui = Instance.new("ScreenGui")
 gui.Name = "SpinellyHub"
-gui.ResetOnSpawn = false
 gui.Parent = PlayerGui
 
--- ============================================
--- Función NEÓN animado
--- ============================================
+-- ==================================================
+-- Función para neón animado
+-- ==================================================
 local function Neon(obj, color)
 	local glow = Instance.new("UIGradient")
 	glow.Color = ColorSequence.new{ColorSequenceKeypoint.new(0,color), ColorSequenceKeypoint.new(1,color)}
@@ -31,9 +30,9 @@ local function Neon(obj, color)
 	end)
 end
 
--- ============================================
+-- ==================================================
 -- Fondo principal
--- ============================================
+-- ==================================================
 local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0,500,0,550)
 frame.Position = UDim2.new(0.5,-250,0.5,-275)
@@ -42,18 +41,17 @@ frame.BorderSizePixel = 0
 frame.Parent = gui
 Neon(frame, Color3.fromRGB(0,255,255))
 
--- ============================================
+-- ==================================================
 -- Panel lateral plegable
--- ============================================
+-- ==================================================
 local panel = Instance.new("Frame")
 panel.Size = UDim2.new(0,150,1,0)
-panel.Position = UDim2.new(0, -150,0,0)
+panel.Position = UDim2.new(0,-150,0,0)
 panel.BackgroundColor3 = Color3.fromRGB(10,10,30)
 panel.BorderSizePixel = 0
 panel.Parent = frame
 Neon(panel, Color3.fromRGB(255,0,255))
 
--- Botón de abrir/cerrar panel
 local toggleBtn = Instance.new("TextButton")
 toggleBtn.Size = UDim2.new(0,30,0,100)
 toggleBtn.Position = UDim2.new(0,150,0,10)
@@ -75,34 +73,9 @@ toggleBtn.MouseButton1Click:Connect(function()
 	end
 end)
 
--- ============================================
--- Fondo Matrix
--- ============================================
-local matrix = Instance.new("TextLabel")
-matrix.Size = UDim2.new(1,0,1,0)
-matrix.BackgroundTransparency = 1
-matrix.TextColor3 = Color3.fromRGB(0,255,70)
-matrix.Font = Enum.Font.Code
-matrix.TextSize = 14
-matrix.TextXAlignment = Enum.TextXAlignment.Left
-matrix.TextYAlignment = Enum.TextYAlignment.Top
-matrix.Text = ""
-matrix.Parent = frame
-
-spawn(function()
-	while true do
-		local s=""
-		for i=1,400 do
-			s = s .. tostring(math.random(0,1))
-		end
-		matrix.Text = s
-		task.wait(0.03)
-	end
-end)
-
--- ============================================
--- TÍTULO GLITCH + SONIDO HOLOGRÁFICO
--- ============================================
+-- ==================================================
+-- Título animado
+-- ==================================================
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1,0,0,60)
 title.Position = UDim2.new(0,0,0,10)
@@ -126,19 +99,14 @@ spawn(function()
 			end
 		end
 		title.Text = glitch
-		-- Sonido holográfico (beep simulado)
-		local beep = Instance.new("Sound",frame)
-		beep.SoundId = "rbxassetid://911882175" -- beep corto
-		beep.Volume = 0.3
-		beep:Play()
 		task.wait(0.07)
 	end
 	title.Text = fullTitle
 end)
 
--- ============================================
--- Función para crear botones futuristas
--- ============================================
+-- ==================================================
+-- Función para crear botones
+-- ==================================================
 local function crearBoton(nombre, y, callback)
 	local btn = Instance.new("TextButton")
 	btn.Size = UDim2.new(0,240,0,45)
@@ -152,7 +120,6 @@ local function crearBoton(nombre, y, callback)
 
 	Neon(btn, Color3.fromRGB(0,255,255))
 
-	-- Hover animación
 	btn.MouseEnter:Connect(function()
 		btn.TextColor3 = Color3.fromRGB(255,255,255)
 		btn:TweenSize(UDim2.new(0,260,0,50),"Out","Quad",0.2,true)
@@ -162,25 +129,12 @@ local function crearBoton(nombre, y, callback)
 		btn:TweenSize(UDim2.new(0,240,0,45),"Out","Quad",0.2,true)
 	end)
 
-	btn.MouseButton1Click:Connect(function()
-		-- Transición suave al entrar al modo
-		local overlay = Instance.new("Frame")
-		overlay.Size = UDim2.new(1,0,1,0)
-		overlay.Position = UDim2.new(0,0,0,0)
-		overlay.BackgroundColor3 = Color3.fromRGB(0,255,255)
-		overlay.BackgroundTransparency = 0.7
-		overlay.Parent = frame
-		overlay:TweenSizeAndPosition(UDim2.new(0,0,0,0),UDim2.new(0.5,0,0.5,0),"Out","Quad",0.4,true,function()
-			overlay:Destroy()
-		end)
-		callback()
-	end)
+	btn.MouseButton1Click:Connect(callback)
 end
 
--- ============================================
+-- ==================================================
 -- BOTONES PRINCIPALES
--- ============================================
-
+-- ==================================================
 crearBoton("Main", 100, function() title.Text = "MAIN MODE" end)
 crearBoton("PvP", 160, function() title.Text = "PVP MODE" end)
 crearBoton("Laser Lagger", 220, function() title.Text = "LASER LAGGER" end)
