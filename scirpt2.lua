@@ -3,7 +3,6 @@ local UserInputService = game:GetService("UserInputService")
 local player = Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
 
--- Limpiar GUI previa
 if PlayerGui:FindFirstChild("SpinellyHub") then
 	PlayerGui.SpinellyHub:Destroy()
 end
@@ -12,7 +11,7 @@ local gui = Instance.new("ScreenGui")
 gui.Name = "SpinellyHub"
 gui.Parent = PlayerGui
 
--- Función para neón animado
+-- Función Neon animado
 local function Neon(obj, color)
 	local glow = Instance.new("UIGradient")
 	glow.Color = ColorSequence.new{ColorSequenceKeypoint.new(0,color), ColorSequenceKeypoint.new(1,color)}
@@ -25,14 +24,6 @@ local function Neon(obj, color)
 	end)
 end
 
--- Variables para controlar menú y submenús
-local menuAbierto = true
-local subMenuAbierto = nil
-local titleAnimado = false
-
--- =======================
--- Crear frame principal
--- =======================
 local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0, 500, 0, 550)
 frame.Position = UDim2.new(0.5, 0, 0.5, 0)
@@ -50,9 +41,7 @@ frameCorner.Parent = frame
 
 Neon(frame, Color3.fromRGB(200, 150, 255))
 
--- =======================
 -- Título animado
--- =======================
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, 0, 0, 60)
 title.Position = UDim2.new(0, 0, 0, 10)
@@ -82,12 +71,9 @@ local function animarTitulo()
 	title.Text = fullTitle
 end
 
--- Ejecutar animación título solo una vez al abrir el menú
 animarTitulo()
 
--- =======================
 -- Botón cerrar/minimizar
--- =======================
 local closeBtn = Instance.new("TextButton")
 closeBtn.Size = UDim2.new(0, 30, 0, 30)
 closeBtn.Position = UDim2.new(1, -35, 0, 5)
@@ -103,9 +89,7 @@ local closeBtnCorner = Instance.new("UICorner")
 closeBtnCorner.CornerRadius = UDim.new(0, 6)
 closeBtnCorner.Parent = closeBtn
 
--- =======================
 -- Botón "S" morado movible para restaurar
--- =======================
 local miniBtn = Instance.new("TextButton")
 miniBtn.Size = UDim2.new(0, 50, 0, 50)
 miniBtn.Position = UDim2.new(0, 50, 1, -70)
@@ -122,7 +106,7 @@ local miniCorner = Instance.new("UICorner")
 miniCorner.CornerRadius = UDim.new(0, 25)
 miniCorner.Parent = miniBtn
 
--- Hacer botón mini movible
+-- Movible "S" button
 local dragging = false
 local dragInput, dragStart, startPos
 
@@ -148,19 +132,13 @@ end)
 UserInputService.InputChanged:Connect(function(input)
 	if input == dragInput and dragging then
 		local delta = input.Position - dragStart
-		local newPos = UDim2.new(
-			math.clamp(startPos.X.Scale, 0, 1),
-			math.clamp(startPos.X.Offset + delta.X, 0, workspace.CurrentCamera.ViewportSize.X - miniBtn.AbsoluteSize.X),
-			math.clamp(startPos.Y.Scale, 0, 1),
-			math.clamp(startPos.Y.Offset + delta.Y, 0, workspace.CurrentCamera.ViewportSize.Y - miniBtn.AbsoluteSize.Y)
-		)
-		miniBtn.Position = newPos
+		local newX = math.clamp(startPos.X.Offset + delta.X, 0, workspace.CurrentCamera.ViewportSize.X - miniBtn.AbsoluteSize.X)
+		local newY = math.clamp(startPos.Y.Offset + delta.Y, 0, workspace.CurrentCamera.ViewportSize.Y - miniBtn.AbsoluteSize.Y)
+		miniBtn.Position = UDim2.new(0, newX, 0, newY)
 	end
 end)
 
--- =======================
 -- Función para crear interruptor toggle con animación
--- =======================
 local function crearInterruptor(parent, y, nombre, callback)
 	local lbl = Instance.new("TextLabel")
 	lbl.Size = UDim2.new(0, 180, 0, 40)
@@ -232,10 +210,10 @@ local function crearInterruptor(parent, y, nombre, callback)
 	actualizar()
 end
 
--- =======================
--- Crear submenú
--- =======================
+local subMenuAbierto = nil
+
 local function crearSubmenu(titulo, opciones)
+	-- Cerrar submenú abierto antes de abrir otro
 	if subMenuAbierto then
 		subMenuAbierto:Destroy()
 		subMenuAbierto = nil
@@ -294,9 +272,6 @@ local function crearSubmenu(titulo, opciones)
 	subMenuAbierto = sub
 end
 
--- =======================
--- Crear botones principales
--- =======================
 local function crearBoton(nombre, y, opciones)
 	local btn = Instance.new("TextButton")
 	btn.Size = UDim2.new(0, 240, 0, 45)
@@ -325,18 +300,17 @@ local function crearBoton(nombre, y, opciones)
 	end)
 
 	btn.MouseButton1Click:Connect(function()
-		-- Cerrar submenú abierto si hay alguno
-		if subMenuAbierto then
+		-- Si el submenú está abierto y es el mismo botón, cerrar submenú
+		if subMenuAbierto and subMenuAbierto.Name == nombre then
 			subMenuAbierto:Destroy()
 			subMenuAbierto = nil
+		else
+			crearSubmenu(nombre, opciones)
+			subMenuAbierto.Name = nombre -- para controlar cuál está abierto
 		end
-		crearSubmenu(nombre, opciones)
 	end)
 end
 
--- =======================
--- Opciones y callbacks
--- =======================
 local opcionesMain = {
 	{nombre = "Speed Boost", callback = function(state) print("Speed Boost:", state) end},
 	{nombre = "Jump Boost", callback = function(state) print("Jump Boost:", state) end}
@@ -355,15 +329,12 @@ local opcionesZZZ = {
 	{nombre = "Activar ZZZ", callback = function(state) print("ZZZ:", state) end}
 }
 
--- Crear botones principales con opciones
 crearBoton("Main", 100, opcionesMain)
 crearBoton("PvP", 160, opcionesPvP)
 crearBoton("Laser Lagger", 220, opcionesLaser)
 crearBoton("ZZZ", 280, opcionesZZZ)
 
--- =======================
 -- Botón Discord redondo abajo a la derecha
--- =======================
 local discordBtn = Instance.new("ImageButton")
 discordBtn.Size = UDim2.new(0, 50, 0, 50)
 discordBtn.Position = UDim2.new(1, -60, 1, -60)
@@ -381,15 +352,10 @@ discordBtn.MouseButton1Click:Connect(function()
 	setclipboard("https://discord.gg/SB5AFaA5uW")
 end)
 
--- =======================
--- Lógica cerrar / minimizar y restaurar menú
--- =======================
 closeBtn.MouseButton1Click:Connect(function()
 	frame.Visible = false
 	miniBtn.Visible = true
-	menuAbierto = false
 
-	-- Cerrar submenú si está abierto
 	if subMenuAbierto then
 		subMenuAbierto:Destroy()
 		subMenuAbierto = nil
@@ -399,5 +365,4 @@ end)
 miniBtn.MouseButton1Click:Connect(function()
 	frame.Visible = true
 	miniBtn.Visible = false
-	menuAbierto = true
 end)
