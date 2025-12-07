@@ -37,6 +37,39 @@ Neon(frame, Color3.fromRGB(0,255,255))
 frame.Active = true
 frame.Draggable = true
 
+-- Título animado
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1,0,0,60)
+title.Position = UDim2.new(0,0,0,10)
+title.BackgroundTransparency = 1
+title.TextColor3 = Color3.fromRGB(0,255,255)
+title.Font = Enum.Font.Code
+title.TextSize = 36
+title.Text = ""
+title.Parent = frame
+
+local function animarTitulo(txt)
+	title.Text = ""
+	spawn(function()
+		for i = 1, #txt do
+			local glitch = ""
+			for j = 1, i do
+				if math.random(1,4) == 1 then
+					glitch = glitch .. string.char(math.random(33,126))
+				else
+					glitch = glitch .. txt:sub(j,j)
+				end
+			end
+			title.Text = glitch
+			task.wait(0.07)
+		end
+		title.Text = txt
+	end)
+end
+
+-- Ejecutar animación solo la primera vez
+animarTitulo("SPINELLY HUB")
+
 -- Botón cerrar X
 local closeBtn = Instance.new("TextButton")
 closeBtn.Size = UDim2.new(0,30,0,30)
@@ -51,6 +84,9 @@ closeBtn.Parent = frame
 closeBtn.MouseEnter:Connect(function() closeBtn.TextColor3 = Color3.fromRGB(255,100,100) end)
 closeBtn.MouseLeave:Connect(function() closeBtn.TextColor3 = Color3.fromRGB(255,0,0) end)
 closeBtn.MouseButton1Click:Connect(function() gui:Destroy() end)
+
+-- Variable para controlar submenú abierto
+local subMenuAbierto = nil
 
 -- Función para crear interruptor
 local function crearInterruptor(parent, y, nombre, callback)
@@ -98,6 +134,10 @@ end
 
 -- Función para crear submenús
 local function crearSubmenu(titulo, opciones)
+	if subMenuAbierto then
+		subMenuAbierto:Destroy()
+	end
+
 	local sub = Instance.new("Frame")
 	sub.Size = UDim2.new(0,300,0,50 + #opciones*50)
 	sub.Position = UDim2.new(0.5,-150,0.5,-25 - #opciones*25)
@@ -128,12 +168,16 @@ local function crearSubmenu(titulo, opciones)
 	btnCerrar.BackgroundColor3 = Color3.fromRGB(20,20,20)
 	btnCerrar.BorderSizePixel = 0
 	btnCerrar.Parent = sub
-	btnCerrar.MouseButton1Click:Connect(function() sub:Destroy() end)
+	btnCerrar.MouseButton1Click:Connect(function()
+		sub:Destroy()
+		subMenuAbierto = nil
+	end)
 
-	-- Crear botones/interruptores
 	for i,opt in ipairs(opciones) do
 		crearInterruptor(sub, 40 + (i-1)*45, opt.nombre, opt.callback)
 	end
+
+	subMenuAbierto = sub
 end
 
 -- Función para crear botones principales
@@ -161,7 +205,7 @@ local function crearBoton(nombre, y, callback)
 	btn.MouseButton1Click:Connect(callback)
 end
 
--- BOTONES PRINCIPALES Y SUBMENÚS CON INTERRUPTORES
+-- BOTONES PRINCIPALES Y SUBMENÚS
 crearBoton("Main", 100, function()
 	crearSubmenu("MAIN MODE", {
 		{nombre="Speed Boost", callback=function(state) print("Speed Boost:", state) end},
@@ -188,8 +232,17 @@ crearBoton("ZZZ", 280, function()
 	})
 end)
 
-crearBoton("Discord", 340, function()
-	setclipboard("https://discord.gg/")
-	print("Discord copiado!")
+-- Botón Discord redondo abajo a la derecha
+local discordBtn = Instance.new("ImageButton")
+discordBtn.Size = UDim2.new(0,50,0,50)
+discordBtn.Position = UDim2.new(1,-60,1,-60)
+discordBtn.BackgroundTransparency = 1
+discordBtn.Image = "rbxassetid://10854386543" -- Logo Discord
+discordBtn.Parent = frame
+
+discordBtn.MouseButton1Click:Connect(function()
+	setclipboard("https://discord.gg/SB5AFaA5uW")
+	print("Discord copiado y enlace listo")
 end)
 
+Neon(discordBtn, Color3.fromRGB(0,255,255))
