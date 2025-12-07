@@ -1,3 +1,7 @@
+--==================================================
+--           SPINELLY HUB - LUX EDITION UI
+--==================================================
+
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local player = Players.LocalPlayer
@@ -10,360 +14,378 @@ end
 local gui = Instance.new("ScreenGui")
 gui.Name = "SpinellyHub"
 gui.Parent = PlayerGui
+gui.IgnoreGuiInset = true
 
--- Tabla para guardar estados de interruptores
 local estadosInterruptores = {}
 
--- Función Neon animado
-local function Neon(obj, color)
-    local glow = Instance.new("UIGradient")
-    glow.Color = ColorSequence.new{ColorSequenceKeypoint.new(0,color), ColorSequenceKeypoint.new(1,color)}
-    glow.Rotation = 90
-    glow.Parent = obj
-    spawn(function()
-        while task.wait(0.02) do
-            glow.Rotation = glow.Rotation + 1
+---------------------------------------------------------------------
+-- 🔮 EFECTO GLASS (CRISTAL) + SOMBRA + ANIMACIÓN SUAVE DE APARICIÓN
+---------------------------------------------------------------------
+
+local function glass(obj)
+    local blur = Instance.new("UIGradient")
+    blur.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255,255,255)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(220,220,255))
+    }
+    blur.Transparency = NumberSequence.new{
+        NumberSequenceKeypoint.new(0, 0.80),
+        NumberSequenceKeypoint.new(1, 0.80)
+    }
+    blur.Rotation = 45
+    blur.Parent = obj
+end
+
+local function shadow(obj)
+    local shadow = Instance.new("ImageLabel")
+    shadow.Name = "Shadow"
+    shadow.BackgroundTransparency = 1
+    shadow.Image = "rbxassetid://6014261993"
+    shadow.ScaleType = Enum.ScaleType.Slice
+    shadow.SliceCenter = Rect.new(49,49,450,450)
+    shadow.Size = UDim2.new(1,35,1,35)
+    shadow.Position = UDim2.new(0,-17,0,-17)
+    shadow.ImageTransparency = 0.45
+    shadow.Parent = obj
+end
+
+local function aparecer(obj)
+    obj.BackgroundTransparency = 1
+    obj.Position = UDim2.new(obj.Position.X.Scale, obj.Position.X.Offset, obj.Position.Y.Scale+0.02, obj.Position.Y.Offset)
+
+    task.spawn(function()
+        for i=1,20 do
+            obj.BackgroundTransparency -= 0.05
+            obj.Position = obj.Position:Lerp(
+                UDim2.new(obj.Position.X.Scale, obj.Position.X.Offset, obj.Position.Y.Scale - 0.001, obj.Position.Y.Offset),
+                0.3
+            )
+            task.wait(0.01)
         end
     end)
 end
 
--- Frame principal
+---------------------------------------------------------------------
+-- 🟪 FRAME PRINCIPAL GLASS + SOMBRA + ANIMACIÓN
+---------------------------------------------------------------------
+
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 500, 0, 550)
-frame.Position = UDim2.new(0.5, 0, 0.5, 0)
-frame.AnchorPoint = Vector2.new(0.5, 0.5)
-frame.BackgroundColor3 = Color3.fromRGB(35, 20, 60)
+frame.Size = UDim2.new(0, 580, 0, 600)
+frame.Position = UDim2.new(0.5,0,0.5,0)
+frame.AnchorPoint = Vector2.new(0.5,0.5)
+frame.BackgroundColor3 = Color3.fromRGB(40, 25, 60)
 frame.BorderSizePixel = 0
-frame.ClipsDescendants = true
 frame.Active = true
 frame.Draggable = true
 frame.Parent = gui
 
-local frameCorner = Instance.new("UICorner")
-frameCorner.CornerRadius = UDim.new(0, 15)
-frameCorner.Parent = frame
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0,18)
+corner.Parent = frame
 
-Neon(frame, Color3.fromRGB(200, 150, 255))
+glass(frame)
+shadow(frame)
+aparecer(frame)
 
--- Título animado
+---------------------------------------------------------------------
+-- ✨ TÍTULO ANIMADO + SUBRAYADO BRILLANTE
+---------------------------------------------------------------------
+
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 60)
-title.Position = UDim2.new(0, 0, 0, 10)
+title.Size = UDim2.new(1,0,0,70)
+title.Position = UDim2.new(0,0,0,10)
 title.BackgroundTransparency = 1
-title.TextColor3 = Color3.fromRGB(200, 150, 255)
-title.Font = Enum.Font.Code
-title.TextSize = 36
-title.Text = ""
-title.TextStrokeColor3 = Color3.new(0, 0, 0)
-title.TextStrokeTransparency = 0.5
+title.TextColor3 = Color3.fromRGB(210,160,255)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 42
+title.Text = "SPINELLY HUB"
 title.Parent = frame
 
-local function animarTitulo()
-    local fullTitle = "SPINELLY HUB"
-    for i = 1, #fullTitle do
-        local glitch = ""
-        for j = 1, i do
-            if math.random(1, 4) == 1 then
-                glitch = glitch .. string.char(math.random(33, 126))
-            else
-                glitch = glitch .. fullTitle:sub(j, j)
-            end
-        end
-        title.Text = glitch
-        task.wait(0.07)
+local subrayado = Instance.new("Frame")
+subrayado.Size = UDim2.new(0.4,0,0,3)
+subrayado.Position = UDim2.new(0.3,0,0,65)
+subrayado.BackgroundColor3 = Color3.fromRGB(210,160,255)
+subrayado.BorderSizePixel = 0
+subrayado.Parent = frame
+
+local subCorner = Instance.new("UICorner")
+subCorner.CornerRadius = UDim.new(1,0)
+subCorner.Parent = subrayado
+
+-- Animación vibrante
+spawn(function()
+    while true do
+        subrayado:TweenSize(UDim2.new(0.45,0,0,4), "Out", "Quad", 1, true)
+        task.wait(1)
+        subrayado:TweenSize(UDim2.new(0.35,0,0,3), "Out", "Quad", 1, true)
+        task.wait(1)
     end
-    title.Text = fullTitle
-end
+end)
 
-animarTitulo() -- Se ejecuta solo al abrir el menú principal
+---------------------------------------------------------------------
+-- ❌ BOTÓN CERRAR / 🔽 MINI-BOTÓN RESTAURAR
+---------------------------------------------------------------------
 
--- Botón cerrar/minimizar
 local closeBtn = Instance.new("TextButton")
-closeBtn.Size = UDim2.new(0, 30, 0, 30)
-closeBtn.Position = UDim2.new(1, -35, 0, 5)
-closeBtn.Text = "X"
-closeBtn.Font = Enum.Font.Code
-closeBtn.TextSize = 24
-closeBtn.TextColor3 = Color3.fromRGB(255, 0, 0)
-closeBtn.BackgroundColor3 = Color3.fromRGB(50, 30, 60)
+closeBtn.Size = UDim2.new(0,35,0,35)
+closeBtn.Position = UDim2.new(1,-45,0,8)
+closeBtn.BackgroundColor3 = Color3.fromRGB(255,80,80)
+closeBtn.Text = "✕"
+closeBtn.Font = Enum.Font.GothamMedium
+closeBtn.TextSize = 22
+closeBtn.TextColor3 = Color3.new(1,1,1)
 closeBtn.BorderSizePixel = 0
 closeBtn.Parent = frame
 
-local closeBtnCorner = Instance.new("UICorner")
-closeBtnCorner.CornerRadius = UDim.new(0, 6)
-closeBtnCorner.Parent = closeBtn
+local cbCorner = Instance.new("UICorner")
+cbCorner.CornerRadius = UDim.new(1,0)
+cbCorner.Parent = closeBtn
 
--- Botón "S" morado movible para restaurar
+-- Mini botón restaurar
 local miniBtn = Instance.new("TextButton")
-miniBtn.Size = UDim2.new(0, 50, 0, 50)
-miniBtn.Position = UDim2.new(0, 50, 1, -70)
-miniBtn.AnchorPoint = Vector2.new(0.5, 0.5)
-miniBtn.BackgroundColor3 = Color3.fromRGB(150, 0, 255)
-miniBtn.Text = "S"
-miniBtn.Font = Enum.Font.Code
+miniBtn.Size = UDim2.new(0,60,0,60)
+miniBtn.Position = UDim2.new(0.1,0,0.9,0)
+miniBtn.BackgroundColor3 = Color3.fromRGB(130, 0, 255)
+miniBtn.Text = "⚡"
+miniBtn.TextColor3 = Color3.new(1,1,1)
 miniBtn.TextSize = 28
-miniBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 miniBtn.Visible = false
 miniBtn.Parent = gui
 
 local miniCorner = Instance.new("UICorner")
-miniCorner.CornerRadius = UDim.new(0, 25)
+miniCorner.CornerRadius = UDim.new(1,0)
 miniCorner.Parent = miniBtn
 
--- Movible "S" button
-local dragging = false
-local dragInput, dragStart, startPos
+---------------------------------------------------------------------
+-- 🎛 BOTONES BONITOS DEL MENÚ
+---------------------------------------------------------------------
 
-miniBtn.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = true
-        dragStart = input.Position
-        startPos = miniBtn.Position
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                dragging = false
-            end
-        end)
-    end
-end)
+local function crearBoton(nombre, y)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0, 300, 0, 55)
+    btn.Position = UDim2.new(0.5, -150, 0, y)
+    btn.BackgroundColor3 = Color3.fromRGB(55, 35, 80)
+    btn.Text = nombre
+    btn.Font = Enum.Font.GothamMedium
+    btn.TextColor3 = Color3.fromRGB(210,160,255)
+    btn.TextSize = 26
+    btn.Parent = frame
 
-miniBtn.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement then
-        dragInput = input
-    end
-end)
+    local c = Instance.new("UICorner")
+    c.CornerRadius = UDim.new(0, 14)
+    c.Parent = btn
 
-UserInputService.InputChanged:Connect(function(input)
-    if input == dragInput and dragging then
-        local delta = input.Position - dragStart
-        local newX = math.clamp(startPos.X.Offset + delta.X, 0, workspace.CurrentCamera.ViewportSize.X - miniBtn.AbsoluteSize.X)
-        local newY = math.clamp(startPos.Y.Offset + delta.Y, 0, workspace.CurrentCamera.ViewportSize.Y - miniBtn.AbsoluteSize.Y)
-        miniBtn.Position = UDim2.new(0, newX, 0, newY)
-    end
-end)
+    shadow(btn)
 
--- Función para crear interruptor toggle con animación y persistencia
-local function crearInterruptor(parent, y, nombre, callback)
-    -- Estado persistente
-    if estadosInterruptores[nombre] == nil then
-        estadosInterruptores[nombre] = false
-    end
-
-    local lbl = Instance.new("TextLabel")
-    lbl.Size = UDim2.new(0, 180, 0, 40)
-    lbl.Position = UDim2.new(0, 10, 0, y)
-    lbl.BackgroundTransparency = 1
-    lbl.Text = nombre
-    lbl.Font = Enum.Font.Code
-    lbl.TextSize = 20
-    lbl.TextColor3 = Color3.fromRGB(200, 150, 255)
-    lbl.Parent = parent
-
-    local toggle = Instance.new("Frame")
-    toggle.Size = UDim2.new(0, 50, 0, 25)
-    toggle.Position = UDim2.new(1, -60, 0, y + 7)
-    toggle.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-    toggle.BorderSizePixel = 0
-    toggle.Parent = parent
-    toggle.ClipsDescendants = true
-    local toggleCorner = Instance.new("UICorner")
-    toggleCorner.CornerRadius = UDim.new(1, 0)
-    toggleCorner.Parent = toggle
-
-    local circle = Instance.new("Frame")
-    circle.Size = UDim2.new(0, 23, 0, 23)
-    circle.Position = UDim2.new(0, 1, 0, 1)
-    circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    circle.BorderSizePixel = 0
-    circle.Parent = toggle
-    local circleCorner = Instance.new("UICorner")
-    circleCorner.CornerRadius = UDim.new(1, 0)
-    circleCorner.Parent = circle
-
-    local function actualizar()
-        local estado = estadosInterruptores[nombre]
-        if estado then
-            toggle.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-            circle:TweenPosition(UDim2.new(0,26,0,1), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
-        else
-            toggle.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-            circle:TweenPosition(UDim2.new(0,1,0,1), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
-        end
-    end
-
-    local function cambiarEstado()
-        estadosInterruptores[nombre] = not estadosInterruptores[nombre]
-        actualizar()
-        callback(estadosInterruptores[nombre])
-    end
-
-    toggle.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            cambiarEstado()
-        end
+    -- Hover suave
+    btn.MouseEnter:Connect(function()
+        btn:TweenSize(UDim2.new(0, 320, 0, 60), "Out", "Quad", 0.2, true)
+        btn.TextColor3 = Color3.new(1,1,1)
     end)
-    circle.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            cambiarEstado()
-        end
-    end)
-    lbl.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            cambiarEstado()
-        end
+    btn.MouseLeave:Connect(function()
+        btn:TweenSize(UDim2.new(0, 300, 0, 55), "Out", "Quad", 0.2, true)
+        btn.TextColor3 = Color3.fromRGB(210,160,255)
     end)
 
-    actualizar() -- mostrar estado guardado al crear
+    return btn
 end
+
+---------------------------------------------------------------------
+-- 🎛 SUBMENÚ MODERNO CON SCROLL
+---------------------------------------------------------------------
 
 local subMenuAbierto = nil
 
-local function crearSubmenu(titulo, opciones)
-    if subMenuAbierto then
-        subMenuAbierto:Destroy()
-        subMenuAbierto = nil
-    end
+local function crearSubmenu(titulo, lista)
+    if subMenuAbierto then subMenuAbierto:Destroy() end
 
     local sub = Instance.new("Frame")
-    sub.Size = UDim2.new(0, 320, 0, 60 + #opciones * 50)
-    sub.Position = UDim2.new(0.5, -160, 0.5, -30 - (#opciones * 25))
-    sub.BackgroundColor3 = Color3.fromRGB(40, 25, 65)
+    sub.Size = UDim2.new(0, 350, 0, 450)
+    sub.Position = UDim2.new(0.5, -175, 0.5, -225)
+    sub.BackgroundColor3 = Color3.fromRGB(40,25,60)
     sub.BorderSizePixel = 0
-    sub.ClipsDescendants = true
     sub.Active = true
     sub.Draggable = true
     sub.Parent = gui
 
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 15)
-    corner.Parent = sub
+    local c = Instance.new("UICorner")
+    c.CornerRadius = UDim.new(0,16)
+    c.Parent = sub
 
-    Neon(sub, Color3.fromRGB(200, 150, 255))
+    glass(sub)
+    shadow(sub)
+    aparecer(sub)
 
+    -- Título
     local lbl = Instance.new("TextLabel")
-    lbl.Size = UDim2.new(1, 0, 0, 40)
-    lbl.Position = UDim2.new(0, 0, 0, 10)
+    lbl.Size = UDim2.new(1,0,0,60)
     lbl.BackgroundTransparency = 1
     lbl.Text = titulo
-    lbl.Font = Enum.Font.Code
-    lbl.TextSize = 26
-    lbl.TextColor3 = Color3.fromRGB(200, 150, 255)
+    lbl.Font = Enum.Font.GothamBold
+    lbl.TextSize = 32
+    lbl.TextColor3 = Color3.fromRGB(210,160,255)
     lbl.Parent = sub
 
-    local btnCerrar = Instance.new("TextButton")
-    btnCerrar.Size = UDim2.new(0, 30, 0, 30)
-    btnCerrar.Position = UDim2.new(1, -35, 0, 10)
-    btnCerrar.Text = "X"
-    btnCerrar.Font = Enum.Font.Code
-    btnCerrar.TextSize = 24
-    btnCerrar.TextColor3 = Color3.fromRGB(255, 0, 0)
-    btnCerrar.BackgroundColor3 = Color3.fromRGB(50, 30, 60)
-    btnCerrar.BorderSizePixel = 0
-    btnCerrar.Parent = sub
+    -- Botón cerrar
+    local x = Instance.new("TextButton")
+    x.Size = UDim2.new(0,30,0,30)
+    x.Position = UDim2.new(1,-40,0,10)
+    x.BackgroundColor3 = Color3.fromRGB(255,80,80)
+    x.Text = "✕"
+    x.Font = Enum.Font.Gotham
+    x.TextColor3 = Color3.new(1,1,1)
+    x.TextSize = 20
+    x.BorderSizePixel = 0
+    x.Parent = sub
+    local xc = Instance.new("UICorner")
+    xc.CornerRadius = UDim.new(1,0)
+    xc.Parent = x
+    x.MouseButton1Click:Connect(function() sub:Destroy() subMenuAbierto=nil end)
 
-    local btnCerrarCorner = Instance.new("UICorner")
-    btnCerrarCorner.CornerRadius = UDim.new(0, 6)
-    btnCerrarCorner.Parent = btnCerrar
+    -- Scroll
+    local scroll = Instance.new("ScrollingFrame")
+    scroll.Size = UDim2.new(1,-20,1,-80)
+    scroll.Position = UDim2.new(0,10,0,70)
+    scroll.CanvasSize = UDim2.new(0,0,0,#lista * 55)
+    scroll.BackgroundTransparency = 1
+    scroll.Parent = sub
 
-    btnCerrar.MouseButton1Click:Connect(function()
-        sub:Destroy()
-        subMenuAbierto = nil
-    end)
+    local layout = Instance.new("UIListLayout")
+    layout.Padding = UDim.new(0,10)
+    layout.Parent = scroll
 
-    for i, opt in ipairs(opciones) do
-        crearInterruptor(sub, 60 + (i - 1) * 45, opt.nombre, opt.callback)
+    -- Interruptores
+    local function toggleUI(nombre, callback)
+        local cont = Instance.new("Frame")
+        cont.Size = UDim2.new(1,-20,0,45)
+        cont.BackgroundColor3 = Color3.fromRGB(55,35,80)
+        cont.Parent = scroll
+
+        local cc = Instance.new("UICorner")
+        cc.CornerRadius = UDim.new(0,14)
+        cc.Parent = cont
+
+        local txt = Instance.new("TextLabel")
+        txt.Size = UDim2.new(0.6,0,1,0)
+        txt.BackgroundTransparency = 1
+        txt.Text = nombre
+        txt.Font = Enum.Font.Gotham
+        txt.TextSize = 22
+        txt.TextColor3 = Color3.fromRGB(210,160,255)
+        txt.Parent = cont
+
+        local sw = Instance.new("TextButton")
+        sw.Size = UDim2.new(0,70,0,30)
+        sw.Position = UDim2.new(1,-80,0.5,-15)
+        sw.BackgroundColor3 = Color3.fromRGB(255,70,70)
+        sw.Text = ""
+        sw.BorderSizePixel = 0
+        sw.Parent = cont
+
+        local swc = Instance.new("UICorner")
+        swc.CornerRadius = UDim.new(1,0)
+        swc.Parent = sw
+
+        local circ = Instance.new("Frame")
+        circ.Size = UDim2.new(0,26,0,26)
+        circ.Position = UDim2.new(0,2,0,2)
+        circ.BackgroundColor3 = Color3.new(1,1,1)
+        circ.Parent = sw
+
+        local cc2 = Instance.new("UICorner")
+        cc2.CornerRadius = UDim.new(1,0)
+        cc2.Parent = circ
+
+        if estadosInterruptores[nombre] == nil then estadosInterruptores[nombre]=false end
+
+        local function update()
+            if estadosInterruptores[nombre] then
+                sw.BackgroundColor3 = Color3.fromRGB(100,255,100)
+                circ:TweenPosition(UDim2.new(0,42,0,2), "Out", "Quad", 0.2, true)
+            else
+                sw.BackgroundColor3 = Color3.fromRGB(255,70,70)
+                circ:TweenPosition(UDim2.new(0,2,0,2), "Out", "Quad", 0.2, true)
+            end
+        end
+
+        sw.MouseButton1Click:Connect(function()
+            estadosInterruptores[nombre] = not estadosInterruptores[nombre]
+            update()
+            callback(estadosInterruptores[nombre])
+        end)
+
+        update()
+    end
+
+    for _,opt in ipairs(lista) do
+        toggleUI(opt.nombre, opt.callback)
     end
 
     subMenuAbierto = sub
 end
 
-local function crearBoton(nombre, y, opciones)
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0, 240, 0, 45)
-    btn.Position = UDim2.new(0.5, -120, 0, y)
-    btn.BackgroundColor3 = Color3.fromRGB(45, 25, 70)
-    btn.TextColor3 = Color3.fromRGB(200, 150, 255)
-    btn.Text = nombre
-    btn.Font = Enum.Font.Code
-    btn.TextSize = 22
-    btn.Parent = frame
+---------------------------------------------------------------------
+-- 📁 CONFIGURACIÓN DE BOTONES Y SUBMENÚS
+---------------------------------------------------------------------
 
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 12)
-    corner.Parent = btn
+local mainBtn = crearBoton("Main", 120)
+mainBtn.MouseButton1Click:Connect(function()
+    crearSubmenu("Main", {
+        {nombre="Speed Boost", callback=function(s) print("Speed:",s) end},
+        {nombre="Jump Boost",  callback=function(s) print("Jump:",s) end},
+    })
+end)
 
-    Neon(btn, Color3.fromRGB(200, 150, 255))
+local pvpBtn = crearBoton("PvP", 190)
+pvpBtn.MouseButton1Click:Connect(function()
+    crearSubmenu("PvP", {
+        {nombre="Auto Hit", callback=function(s) print("Hit:",s) end},
+        {nombre="Auto Medusa", callback=function(s) print("Medusa:",s) end},
+    })
+end)
 
-    btn.MouseEnter:Connect(function()
-        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-        btn:TweenSize(UDim2.new(0, 260, 0, 50), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
-    end)
+local laserBtn = crearBoton("Laser Lagger", 260)
+laserBtn.MouseButton1Click:Connect(function()
+    crearSubmenu("Laser Lagger", {
+        {nombre="Activar Laser", callback=function(s) print("Laser:",s) end},
+    })
+end)
 
-    btn.MouseLeave:Connect(function()
-        btn.TextColor3 = Color3.fromRGB(200, 150, 255)
-        btn:TweenSize(UDim2.new(0, 240, 0, 45), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
-    end)
+local zzzBtn = crearBoton("ZZZ", 330)
+zzzBtn.MouseButton1Click:Connect(function()
+    crearSubmenu("ZZZ", {
+        {nombre="Activar ZZZ", callback=function(s) print("ZZZ:",s) end},
+    })
+end)
 
-    btn.MouseButton1Click:Connect(function()
-        if subMenuAbierto and subMenuAbierto.Name == nombre then
-            subMenuAbierto:Destroy()
-            subMenuAbierto = nil
-        else
-            crearSubmenu(nombre, opciones)
-            subMenuAbierto.Name = nombre
-        end
-    end)
-end
+---------------------------------------------------------------------
+-- 🌐 DISCORD ICON BONITO
+---------------------------------------------------------------------
 
-local opcionesMain = {
-    {nombre = "Speed Boost", callback = function(state) print("Speed Boost:", state) end},
-    {nombre = "Jump Boost", callback = function(state) print("Jump Boost:", state) end}
-}
-
-local opcionesPvP = {
-    {nombre = "Auto Hit", callback = function(state) print("Auto Hit:", state) end},
-    {nombre = "Auto Medusa", callback = function(state) print("Auto Medusa:", state) end}
-}
-
-local opcionesLaser = {
-    {nombre = "Activar Laser", callback = function(state) print("Laser Lagger:", state) end}
-}
-
-local opcionesZZZ = {
-    {nombre = "Activar ZZZ", callback = function(state) print("ZZZ:", state) end}
-}
-
-crearBoton("Main", 100, opcionesMain)
-crearBoton("PvP", 160, opcionesPvP)
-crearBoton("Laser Lagger", 220, opcionesLaser)
-crearBoton("ZZZ", 280, opcionesZZZ)
-
--- Botón Discord redondo abajo a la derecha
 local discordBtn = Instance.new("ImageButton")
-discordBtn.Size = UDim2.new(0, 50, 0, 50)
-discordBtn.Position = UDim2.new(1, -60, 1, -60)
-discordBtn.BackgroundTransparency = 1
+discordBtn.Size = UDim2.new(0,60,0,60)
+discordBtn.Position = UDim2.new(1,-75,1,-75)
+discordBtn.BackgroundColor3 = Color3.fromRGB(80,50,120)
 discordBtn.Image = "rbxassetid://9069883411"
 discordBtn.Parent = frame
 
-local discordCorner = Instance.new("UICorner")
-discordCorner.CornerRadius = UDim.new(0, 25)
-discordCorner.Parent = discordBtn
+local dCorner = Instance.new("UICorner")
+dCorner.CornerRadius = UDim.new(1,0)
+dCorner.Parent = discordBtn
 
-Neon(discordBtn, Color3.fromRGB(200, 150, 255))
+shadow(discordBtn)
 
 discordBtn.MouseButton1Click:Connect(function()
     setclipboard("https://discord.gg/SB5AFaA5uW")
 end)
 
--- Cerrar/minimizar
+---------------------------------------------------------------------
+-- MINIMIZAR / RESTAURAR
+---------------------------------------------------------------------
+
 closeBtn.MouseButton1Click:Connect(function()
     frame.Visible = false
     miniBtn.Visible = true
-    if subMenuAbierto then
-        subMenuAbierto:Destroy()
-        subMenuAbierto = nil
-    end
 end)
 
 miniBtn.MouseButton1Click:Connect(function()
