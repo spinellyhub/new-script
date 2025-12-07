@@ -1,4 +1,4 @@
-local Players = game:GetService("Players")
+¡local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local player = Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
@@ -24,6 +24,7 @@ local function Neon(obj, color)
 	end)
 end
 
+-- Menu principal
 local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0, 500, 0, 550)
 frame.Position = UDim2.new(0.5, 0, 0.5, 0)
@@ -138,82 +139,89 @@ UserInputService.InputChanged:Connect(function(input)
 	end
 end)
 
--- Función para crear interruptor toggle con animación
+-- Tabla global para guardar estados de los interruptores
+local estadosInterruptores = {}
+
+-- Función para crear interruptor toggle con animación y persistencia
 local function crearInterruptor(parent, y, nombre, callback)
-	local lbl = Instance.new("TextLabel")
-	lbl.Size = UDim2.new(0, 180, 0, 40)
-	lbl.Position = UDim2.new(0, 10, 0, y)
-	lbl.BackgroundTransparency = 1
-	lbl.Text = nombre
-	lbl.Font = Enum.Font.Code
-	lbl.TextSize = 20
-	lbl.TextColor3 = Color3.fromRGB(200, 150, 255)
-	lbl.Parent = parent
+    if estadosInterruptores[nombre] == nil then
+        estadosInterruptores[nombre] = false
+    end
+    local estado = estadosInterruptores[nombre]
 
-	local toggle = Instance.new("Frame")
-	toggle.Size = UDim2.new(0, 50, 0, 25)
-	toggle.Position = UDim2.new(1, -60, 0, y + 7)
-	toggle.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-	toggle.BorderSizePixel = 0
-	toggle.Parent = parent
-	toggle.ClipsDescendants = true
-	local toggleCorner = Instance.new("UICorner")
-	toggleCorner.CornerRadius = UDim.new(1, 0)
-	toggleCorner.Parent = toggle
+    local lbl = Instance.new("TextLabel")
+    lbl.Size = UDim2.new(0, 180, 0, 40)
+    lbl.Position = UDim2.new(0, 10, 0, y)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = nombre
+    lbl.Font = Enum.Font.Code
+    lbl.TextSize = 20
+    lbl.TextColor3 = Color3.fromRGB(200, 150, 255)
+    lbl.Parent = parent
 
-	local circle = Instance.new("Frame")
-	circle.Size = UDim2.new(0, 23, 0, 23)
-	circle.Position = UDim2.new(0, 1, 0, 1)
-	circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	circle.BorderSizePixel = 0
-	circle.Parent = toggle
-	local circleCorner = Instance.new("UICorner")
-	circleCorner.CornerRadius = UDim.new(1, 0)
-	circleCorner.Parent = circle
+    local toggle = Instance.new("Frame")
+    toggle.Size = UDim2.new(0, 50, 0, 25)
+    toggle.Position = UDim2.new(1, -60, 0, y + 7)
+    toggle.BackgroundColor3 = estado and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+    toggle.BorderSizePixel = 0
+    toggle.Parent = parent
+    toggle.ClipsDescendants = true
+    local toggleCorner = Instance.new("UICorner")
+    toggleCorner.CornerRadius = UDim.new(1, 0)
+    toggleCorner.Parent = toggle
 
-	local estado = false
+    local circle = Instance.new("Frame")
+    circle.Size = UDim2.new(0, 23, 0, 23)
+    circle.Position = estado and UDim2.new(0, 26, 0, 1) or UDim2.new(0, 1, 0, 1)
+    circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    circle.BorderSizePixel = 0
+    circle.Parent = toggle
+    local circleCorner = Instance.new("UICorner")
+    circleCorner.CornerRadius = UDim.new(1, 0)
+    circleCorner.Parent = circle
 
-	local function actualizar()
-		if estado then
-			toggle.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-			circle:TweenPosition(UDim2.new(0, 26, 0, 1), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
-		else
-			toggle.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-			circle:TweenPosition(UDim2.new(0, 1, 0, 1), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
-		end
-	end
+    local function actualizar()
+        if estado then
+            toggle.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+            circle:TweenPosition(UDim2.new(0, 26, 0, 1), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
+        else
+            toggle.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+            circle:TweenPosition(UDim2.new(0, 1, 0, 1), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
+        end
+    end
 
-	local function cambiarEstado()
-		estado = not estado
-		actualizar()
-		callback(estado)
-	end
+    local function cambiarEstado()
+        estado = not estado
+        estadosInterruptores[nombre] = estado
+        actualizar()
+        callback(estado)
+    end
 
-	toggle.InputBegan:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 then
-			cambiarEstado()
-		end
-	end)
+    toggle.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            cambiarEstado()
+        end
+    end)
 
-	circle.InputBegan:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 then
-			cambiarEstado()
-		end
-	end)
+    circle.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            cambiarEstado()
+        end
+    end)
 
-	lbl.InputBegan:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 then
-			cambiarEstado()
-		end
-	end)
+    lbl.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            cambiarEstado()
+        end
+    end)
 
-	actualizar()
+    actualizar()
 end
 
 local subMenuAbierto = nil
 
+-- Crear submenú con opciones y toggles
 local function crearSubmenu(titulo, opciones)
-	-- Cerrar submenú abierto antes de abrir otro
 	if subMenuAbierto then
 		subMenuAbierto:Destroy()
 		subMenuAbierto = nil
@@ -272,6 +280,7 @@ local function crearSubmenu(titulo, opciones)
 	subMenuAbierto = sub
 end
 
+-- Crear botones principales
 local function crearBoton(nombre, y, opciones)
 	local btn = Instance.new("TextButton")
 	btn.Size = UDim2.new(0, 240, 0, 45)
@@ -300,17 +309,17 @@ local function crearBoton(nombre, y, opciones)
 	end)
 
 	btn.MouseButton1Click:Connect(function()
-		-- Si el submenú está abierto y es el mismo botón, cerrar submenú
 		if subMenuAbierto and subMenuAbierto.Name == nombre then
 			subMenuAbierto:Destroy()
 			subMenuAbierto = nil
 		else
 			crearSubmenu(nombre, opciones)
-			subMenuAbierto.Name = nombre -- para controlar cuál está abierto
+			subMenuAbierto.Name = nombre
 		end
 	end)
 end
 
+-- Opciones de cada submenú
 local opcionesMain = {
 	{nombre = "Speed Boost", callback = function(state) print("Speed Boost:", state) end},
 	{nombre = "Jump Boost", callback = function(state) print("Jump Boost:", state) end}
@@ -339,7 +348,7 @@ local discordBtn = Instance.new("ImageButton")
 discordBtn.Size = UDim2.new(0, 50, 0, 50)
 discordBtn.Position = UDim2.new(1, -60, 1, -60)
 discordBtn.BackgroundTransparency = 1
-discordBtn.Image = "rbxassetid://9069883411" -- Logo Discord oficial
+discordBtn.Image = "rbxassetid://9069883411"
 discordBtn.Parent = frame
 
 local discordCorner = Instance.new("UICorner")
@@ -355,7 +364,6 @@ end)
 closeBtn.MouseButton1Click:Connect(function()
 	frame.Visible = false
 	miniBtn.Visible = true
-
 	if subMenuAbierto then
 		subMenuAbierto:Destroy()
 		subMenuAbierto = nil
