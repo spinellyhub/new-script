@@ -1,4 +1,3 @@
--- SPINELLY HUB LUA MODERNO — FUNCIONAL EN XENO
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
@@ -8,69 +7,43 @@ if PlayerGui:FindFirstChild("SpinellyHub") then
 	PlayerGui.SpinellyHub:Destroy()
 end
 
--- Crear ScreenGui
 local gui = Instance.new("ScreenGui")
 gui.Name = "SpinellyHub"
 gui.Parent = PlayerGui
 
--- Función de neón animado sutil
-local function Neon(obj, color, speed)
-	speed = speed or 0.02
+-- Neón animado
+local function Neon(obj, color)
 	local glow = Instance.new("UIGradient")
 	glow.Color = ColorSequence.new{ColorSequenceKeypoint.new(0,color), ColorSequenceKeypoint.new(1,color)}
 	glow.Rotation = 90
 	glow.Parent = obj
 	spawn(function()
-		while task.wait(speed) do
-			glow.Rotation = glow.Rotation + 0.5
+		while task.wait(0.02) do
+			glow.Rotation = glow.Rotation + 1
 		end
 	end)
 end
 
--- Variables
-local subMenuAbierto = nil
 local menuAbierto = true
+local subMenuAbierto = nil
 local titleAnimado = false
 
--- Función animar título
-local function animarTitulo(txt)
-	if titleAnimado then return end
-	titleAnimado = true
-	title.Text = ""
-	spawn(function()
-		for i = 1, #txt do
-			local glitch = ""
-			for j = 1, i do
-				if math.random(1,4) == 1 then
-					glitch = glitch .. string.char(math.random(33,126))
-				else
-					glitch = glitch .. txt:sub(j,j)
-				end
-			end
-			title.Text = glitch
-			task.wait(0.07)
-		end
-		title.Text = txt
-	end)
-end
-
--- Ventana principal con sombra y bordes redondeados
+-- Menú principal
 local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0,500,0,550)
-frame.Position = UDim2.new(0.5,-250,0.5,-275)
+frame.Position = UDim2.new(0.5,0,0.5,0)
+frame.AnchorPoint = Vector2.new(0.5,0.5)
 frame.BackgroundColor3 = Color3.fromRGB(25,15,45)
 frame.BorderSizePixel = 0
 frame.ClipsDescendants = true
-frame.AnchorPoint = Vector2.new(0.5,0.5)
 frame.Active = true
 frame.Draggable = true
 frame.Parent = gui
-frame.Rounding = 12 -- Bordes redondeados si roblox permite UICorner
-local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0,12)
-corner.Parent = frame
+local frameCorner = Instance.new("UICorner")
+frameCorner.CornerRadius = UDim.new(0,15)
+frameCorner.Parent = frame
 
-Neon(frame, Color3.fromRGB(200,150,255), 0.03)
+Neon(frame, Color3.fromRGB(200,150,255))
 
 -- Título
 local title = Instance.new("TextLabel")
@@ -83,9 +56,28 @@ title.TextSize = 36
 title.Text = ""
 title.Parent = frame
 
-animarTitulo("SPINELLY HUB")
+-- Animación del título
+if not titleAnimado then
+	titleAnimado = true
+	spawn(function()
+		local fullTitle = "SPINELLY HUB"
+		for i=1,#fullTitle do
+			local glitch = ""
+			for j=1,i do
+				if math.random(1,4)==1 then
+					glitch = glitch..string.char(math.random(33,126))
+				else
+					glitch = glitch..fullTitle:sub(j,j)
+				end
+			end
+			title.Text = glitch
+			task.wait(0.07)
+		end
+		title.Text = fullTitle
+	end)
+end
 
--- Botón cerrar (minimizar)
+-- Botón cerrar/minimizar
 local closeBtn = Instance.new("TextButton")
 closeBtn.Size = UDim2.new(0,30,0,30)
 closeBtn.Position = UDim2.new(1,-35,0,5)
@@ -96,25 +88,19 @@ closeBtn.TextColor3 = Color3.fromRGB(255,0,0)
 closeBtn.BackgroundColor3 = Color3.fromRGB(30,20,40)
 closeBtn.BorderSizePixel = 0
 closeBtn.Parent = frame
-closeBtn.MouseEnter:Connect(function() closeBtn.TextColor3 = Color3.fromRGB(255,100,100) end)
-closeBtn.MouseLeave:Connect(function() closeBtn.TextColor3 = Color3.fromRGB(255,0,0) end)
 
--- Botón minimizar a circulo flotante
+-- Botón “S” morado para restaurar
 local miniBtn = Instance.new("TextButton")
 miniBtn.Size = UDim2.new(0,50,0,50)
 miniBtn.Position = UDim2.new(0,50,1,-70)
+miniBtn.AnchorPoint = Vector2.new(0.5,0.5)
 miniBtn.BackgroundColor3 = Color3.fromRGB(150,0,255)
 miniBtn.Text = "S"
 miniBtn.Font = Enum.Font.Code
 miniBtn.TextSize = 28
 miniBtn.TextColor3 = Color3.fromRGB(255,255,255)
-miniBtn.BorderSizePixel = 0
 miniBtn.Visible = false
-miniBtn.AnchorPoint = Vector2.new(0.5,0.5)
 miniBtn.Parent = gui
-miniBtn.AutoButtonColor = true
-miniBtn.TextScaled = true
-miniBtn.TextWrapped = true
 local miniCorner = Instance.new("UICorner")
 miniCorner.CornerRadius = UDim.new(0,25)
 miniCorner.Parent = miniBtn
@@ -124,14 +110,13 @@ closeBtn.MouseButton1Click:Connect(function()
 	miniBtn.Visible = true
 	menuAbierto = false
 end)
-
 miniBtn.MouseButton1Click:Connect(function()
 	frame.Visible = true
 	miniBtn.Visible = false
 	menuAbierto = true
 end)
 
--- Función crear interruptor moderno
+-- Función crear interruptor
 local function crearInterruptor(parent, y, nombre, callback)
 	local lbl = Instance.new("TextLabel")
 	lbl.Size = UDim2.new(0,180,0,40)
@@ -156,7 +141,6 @@ local function crearInterruptor(parent, y, nombre, callback)
 
 	local estado = false
 	local function actualizar()
-		toggle:TweenSize(UDim2.new(0,40,0,20),"Out","Quad",0.2,true)
 		toggle.BackgroundColor3 = estado and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,0,0)
 	end
 
@@ -177,27 +161,24 @@ local function crearInterruptor(parent, y, nombre, callback)
 	end)
 end
 
--- Crear submenú moderno
+-- Función crear submenú
 local function crearSubmenu(titulo, opciones)
 	if subMenuAbierto then
-		subMenuAbierto:TweenPosition(UDim2.new(0.5,-150,0.5,-25 - #opciones*25),"Out","Quad",0.3,true,function()
-			subMenuAbierto:Destroy()
-		end)
+		subMenuAbierto:Destroy()
 	end
-
 	local sub = Instance.new("Frame")
-	sub.Size = UDim2.new(0,300,0,50 + #opciones*50)
-	sub.Position = UDim2.new(0.5,-150,0.5,-25 - #opciones*25)
+	sub.Size = UDim2.new(0,300,0,50+#opciones*50)
+	sub.Position = UDim2.new(0.5,-150,0.5,-25-#opciones*25)
 	sub.BackgroundColor3 = Color3.fromRGB(25,15,45)
 	sub.BorderSizePixel = 0
-	sub.Parent = gui
+	sub.ClipsDescendants = true
 	sub.Active = true
 	sub.Draggable = true
-	sub.ClipsDescendants = true
-	local subCorner = Instance.new("UICorner")
-	subCorner.CornerRadius = UDim.new(0,12)
-	subCorner.Parent = sub
-	Neon(sub, Color3.fromRGB(200,150,255),0.02)
+	sub.Parent = gui
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0,12)
+	corner.Parent = sub
+	Neon(sub, Color3.fromRGB(200,150,255))
 
 	local lbl = Instance.new("TextLabel")
 	lbl.Size = UDim2.new(1,0,0,40)
@@ -220,9 +201,7 @@ local function crearSubmenu(titulo, opciones)
 	btnCerrar.BorderSizePixel = 0
 	btnCerrar.Parent = sub
 	btnCerrar.MouseButton1Click:Connect(function()
-		sub:TweenPosition(UDim2.new(0.5,-150,0.5,-25 - #opciones*25),"Out","Quad",0.3,true,function()
-			sub:Destroy()
-		end)
+		sub:Destroy()
 		subMenuAbierto = nil
 	end)
 
@@ -233,8 +212,8 @@ local function crearSubmenu(titulo, opciones)
 	subMenuAbierto = sub
 end
 
--- Botones principales modernos
-local function crearBoton(nombre, y, callback)
+-- Función crear botón principal
+local function crearBoton(nombre, y, opciones)
 	local btn = Instance.new("TextButton")
 	btn.Size = UDim2.new(0,240,0,45)
 	btn.Position = UDim2.new(0.5,-120,0,y)
@@ -244,65 +223,53 @@ local function crearBoton(nombre, y, callback)
 	btn.Font = Enum.Font.Code
 	btn.TextSize = 22
 	btn.Parent = frame
-	local btnCorner = Instance.new("UICorner")
-	btnCorner.CornerRadius = UDim.new(0,10)
-	btnCorner.Parent = btn
-	Neon(btn, Color3.fromRGB(200,150,255),0.03)
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0,10)
+	corner.Parent = btn
+	Neon(btn, Color3.fromRGB(200,150,255))
 
 	btn.MouseEnter:Connect(function()
 		btn.TextColor3 = Color3.fromRGB(255,255,255)
-		btn:TweenSize(UDim2.new(0,260,0,50),"Out","Quad",0.25,true)
+		btn:TweenSize(UDim2.new(0,260,0,50),"Out","Quad",0.2,true)
 	end)
 	btn.MouseLeave:Connect(function()
 		btn.TextColor3 = Color3.fromRGB(200,150,255)
-		btn:TweenSize(UDim2.new(0,240,0,45),"Out","Quad",0.25,true)
+		btn:TweenSize(UDim2.new(0,240,0,45),"Out","Quad",0.2,true)
 	end)
 
-	btn.MouseButton1Click:Connect(callback)
+	btn.MouseButton1Click:Connect(function()
+		crearSubmenu(nombre, opciones)
+	end)
 end
 
--- Botones principales y submenús
-crearBoton("Main", 100, function()
-	crearSubmenu("MAIN MODE", {
-		{nombre="Speed Boost", callback=function(state) print("Speed Boost:", state) end},
-		{nombre="Jump Boost", callback=function(state) print("Jump Boost:", state) end}
-	})
-end)
+-- Botones principales con sub-opciones
+crearBoton("Main", 100, {
+	{name="Speed Boost", callback=function(state) print("Speed Boost:", state) end},
+	{name="Jump Boost", callback=function(state) print("Jump Boost:", state) end}
+})
+crearBoton("PvP", 160, {
+	{name="Auto Hit", callback=function(state) print("Auto Hit:", state) end},
+	{name="Auto Medusa", callback=function(state) print("Auto Medusa:", state) end}
+})
+crearBoton("Laser Lagger", 220, {
+	{name="Activar Laser", callback=function(state) print("Laser Lagger:", state) end}
+})
+crearBoton("ZZZ", 280, {
+	{name="Activar ZZZ", callback=function(state) print("ZZZ:", state) end}
+})
 
-crearBoton("PvP", 160, function()
-	crearSubmenu("PVP MODE", {
-		{nombre="Auto Hit", callback=function(state) print("Auto Hit:", state) end},
-		{nombre="Auto Medusa", callback=function(state) print("Auto Medusa:", state) end}
-	})
-end)
-
-crearBoton("Laser Lagger", 220, function()
-	crearSubmenu("LASER LAGGER", {
-		{nombre="Activar Laser", callback=function(state) print("Laser Lagger:", state) end}
-	})
-end)
-
-crearBoton("ZZZ", 280, function()
-	crearSubmenu("ZZZ MODE", {
-		{nombre="Activar ZZZ", callback=function(state) print("ZZZ:", state) end}
-	})
-end)
-
--- Botón Discord redondo moderno
+-- Botón Discord redondo
 local discordBtn = Instance.new("ImageButton")
 discordBtn.Size = UDim2.new(0,50,0,50)
 discordBtn.Position = UDim2.new(1,-60,1,-60)
 discordBtn.BackgroundTransparency = 1
-discordBtn.Image = "rbxassetid://9069883411" -- Logo oficial Discord
+discordBtn.Image = "rbxassetid://9069883411" -- Logo Discord
 discordBtn.Parent = frame
-discordBtn.AutoButtonColor = true
-discordBtn.ImageColor3 = Color3.fromRGB(255,255,255)
 local discordCorner = Instance.new("UICorner")
 discordCorner.CornerRadius = UDim.new(0,25)
 discordCorner.Parent = discordBtn
-Neon(discordBtn, Color3.fromRGB(200,150,255),0.03)
+Neon(discordBtn, Color3.fromRGB(200,150,255))
 
 discordBtn.MouseButton1Click:Connect(function()
 	setclipboard("https://discord.gg/SB5AFaA5uW")
-	print("Discord copiado y enlace listo")
 end)
