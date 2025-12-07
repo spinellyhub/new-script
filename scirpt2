@@ -1,236 +1,128 @@
-import os
-import time
-import random
-import webbrowser
-import tkinter as tk
-from tkinter import messagebox
+-- SPINELLY HUB LUA (XENO COMPATIBLE)
+-- Menú visual completo inspirado en tu script Python
 
-# Intentar cargar flask (si no existe, no rompe el script)
-try:
-    from flask import Flask
-    FLASK_OK = True
-except:
-    FLASK_OK = False
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local PlayerGui = player:WaitForChild("PlayerGui")
 
+-- Limpiar GUI anterior
+if PlayerGui:FindFirstChild("SpinellyHub") then
+	PlayerGui:FindFirstChild("SpinellyHub"):Destroy()
+end
 
-# ================================================================
-# ==================== EFECTOS FUTURISTAS ========================
-# ================================================================
+-- Crear ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "SpinellyHub"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = PlayerGui
 
-RESET="\033[0m"; CYAN="\033[96m"; MAGENTA="\033[95m"; BLUE="\033[94m"
-GREEN="\033[92m"; RED="\033[91m"; BOLD="\033[1m"
+-- Fondo principal
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 400, 0, 500)
+frame.Position = UDim2.new(0.5, -200, 0.5, -250)
+frame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+frame.BorderSizePixel = 0
+frame.Parent = screenGui
 
-def clear():
-    os.system("cls" if os.name == "nt" else "clear")
+-- Fondo Matrix opcional
+local matrixFrame = Instance.new("Frame")
+matrixFrame.Size = UDim2.new(1,0,1,0)
+matrixFrame.BackgroundTransparency = 1
+matrixFrame.Parent = frame
 
-def glitch(text):
-    """Efecto glitch digital"""
-    for _ in range(7):
-        g = "".join(
-            c if random.random() > 0.15 else random.choice("@#$%&/+=*")
-            for c in text
-        )
-        print(MAGENTA + g + RESET, end="\r")
-        time.sleep(0.05)
-    print(CYAN + text + RESET)
+local matrixText = Instance.new("TextLabel")
+matrixText.Size = UDim2.new(1,0,1,0)
+matrixText.Position = UDim2.new(0,0,0,0)
+matrixText.BackgroundTransparency = 1
+matrixText.Font = Enum.Font.Code
+matrixText.TextSize = 14
+matrixText.TextColor3 = Color3.fromRGB(0, 255, 70)
+matrixText.Text = ""
+matrixText.TextXAlignment = Enum.TextXAlignment.Left
+matrixText.TextYAlignment = Enum.TextYAlignment.Top
+matrixText.Parent = matrixFrame
 
-# ================================================================
-# =============== TÍTULO ANIMADO FUTURISTA ========================
-# ================================================================
+-- Animación tipo Matrix
+spawn(function()
+	local chars = "01"
+	while true do
+		local line = ""
+		for i=1,150 do
+			line = line .. string.sub(chars, math.random(1,#chars), math.random(1,#chars))
+		end
+		matrixText.Text = line
+		wait(0.02)
+	end
+end)
 
-def titulo_animado():
-    clear()
-    titulo = "SPINELLY HUB"
-    print(BLUE + "Inicializando holograma..." + RESET)
-    time.sleep(0.5)
+-- Título animado
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 50)
+title.Position = UDim2.new(0,0,0,10)
+title.BackgroundTransparency = 1
+title.TextColor3 = Color3.fromRGB(125, 249, 255)
+title.Font = Enum.Font.Code
+title.TextSize = 32
+title.Text = ""
+title.Parent = frame
 
-    # Efecto de encendido
-    for i in range(1, 6):
-        print(CYAN + ("▮" * i).ljust(12) + RESET, end="\r")
-        time.sleep(0.12)
+local fullTitle = "SPINELLY HUB"
+local index = 0
+spawn(function()
+	while index <= #fullTitle do
+		title.Text = string.sub(fullTitle,1,index)
+		index = index + 1
+		wait(0.07)
+	end
+end)
 
-    print()
-    time.sleep(0.2)
+-- Función para crear botones
+local function crearBoton(nombre, y, func)
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.new(0, 200, 0, 40)
+	btn.Position = UDim2.new(0.5, -100, 0, y)
+	btn.BackgroundColor3 = Color3.fromRGB(40,40,40)
+	btn.TextColor3 = Color3.fromRGB(125,249,255)
+	btn.Font = Enum.Font.Code
+	btn.TextSize = 22
+	btn.Text = nombre
+	btn.Parent = frame
+	btn.MouseButton1Click:Connect(func)
+end
 
-    # Glitch + aparición progresiva
-    mostrado = ""
-    for letra in titulo:
-        mostrado += letra
-        glitch_text = "".join(
-            c if random.random() > 0.25 else random.choice("@#$%&/+=*")
-            for c in mostrado
-        )
-        print(MAGENTA + glitch_text + RESET, end="\r")
-        time.sleep(0.07)
+-- Barra de carga simulada
+local barra = Instance.new("Frame")
+barra.Size = UDim2.new(0,0,0,10)
+barra.Position = UDim2.new(0,0,0,450)
+barra.BackgroundColor3 = Color3.fromRGB(125,249,255)
+barra.Parent = frame
 
-    print(CYAN + BOLD + titulo + RESET)
-    print()
-    time.sleep(0.4)
+spawn(function()
+	for i=1,400 do
+		barra.Size = UDim2.new(0,i,0,10)
+		wait(0.01)
+	end
+end)
 
+-- Botones principales
+crearBoton("Main", 80, function()
+	title.Text = "Main"
+end)
+crearBoton("PvP", 130, function()
+	title.Text = "PvP"
+end)
+crearBoton("Laser Lagger", 180, function()
+	title.Text = "Laser Lagger"
+end)
+crearBoton("ZZZ", 230, function()
+	title.Text = "ZZZ"
+end)
+crearBoton("Discord", 280, function()
+	setclipboard("https://discord.gg/") -- copia al portapapeles
+	title.Text = "Discord copiado al portapapeles!"
+end)
 
-# ================================================================
-# ===================== MODOS TERMINAL ===========================
-# ================================================================
-
-def carga(msg="Cargando"):
-    print(MAGENTA + msg + RESET)
-    for i in range(25):
-        print(CYAN + "[" + "▮"*i + " "*(25-i) + "]" + RESET, end="\r")
-        time.sleep(0.03)
-    print()
-
-def terminal_modulo(name):
-    titulo_animado()
-    carga(f"Iniciando {name}")
-    print(GREEN + f"\n{name} listo.\n" + RESET)
-    input("Presiona Enter para volver...")
-
-def terminal_menu():
-    while True:
-        titulo_animado()
-        print(f"""
-{CYAN}{BOLD}MODOS DISPONIBLES (Terminal){RESET}
-
-1) Main
-2) PvP
-3) Laser Lagger
-4) ZZZ
-
-D) Discord
-X) Volver
-""")
-
-        op = input("Selecciona: ").lower()
-
-        if op == "1":
-            terminal_modulo("MAIN")
-        elif op == "2":
-            terminal_modulo("PVP MODE")
-        elif op == "3":
-            terminal_modulo("LASER LAGGER")
-        elif op == "4":
-            terminal_modulo("ZZZ MODE")
-        elif op == "d":
-            webbrowser.open("https://discord.gg/")
-        elif op == "x":
-            return
-
-
-# ================================================================
-# ======================= MODO MATRIX ============================
-# ================================================================
-
-def matrix_mode():
-    clear()
-    chars="01"
-    print(GREEN + "Modo Matrix — CTRL+C para salir" + RESET)
-    try:
-        while True:
-            print("".join(random.choice(chars) for _ in range(150)))
-            time.sleep(0.02)
-    except KeyboardInterrupt:
-        clear()
-
-
-# ================================================================
-# =========================== GUI ================================
-# ================================================================
-
-def gui_mode():
-    root = tk.Tk()
-    root.title("Spinelly Hub")
-    root.geometry("400x500")
-    root.configure(bg="#0a0a0a")
-
-    tk.Label(root, text="SPINELLY HUB",
-             fg="#7df9ff", bg="#0a0a0a",
-             font=("Consolas", 22, "bold")).pack(pady=20)
-
-    def popup(name):
-        messagebox.showinfo("Spinelly Hub", f"Entrando a {name}")
-
-    tk.Button(root, text="Main", width=20, height=2,
-              command=lambda: popup("Main")).pack(pady=10)
-    tk.Button(root, text="PvP", width=20, height=2,
-              command=lambda: popup("PvP")).pack(pady=10)
-    tk.Button(root, text="Laser Lagger", width=20, height=2,
-              command=lambda: popup("Laser Lagger")).pack(pady=10)
-    tk.Button(root, text="ZZZ", width=20, height=2,
-              command=lambda: popup("ZZZ")).pack(pady=10)
-
-    tk.Button(root, text="Discord", width=20, height=2,
-              bg="#5865F2", fg="white",
-              command=lambda: webbrowser.open("https://discord.gg/")).pack(pady=15)
-
-    root.mainloop()
-
-
-# ================================================================
-# ============================ WEB ===============================
-# ================================================================
-
-def web_mode():
-    if not FLASK_OK:
-        print("⚠ Flask no está instalado. Instálalo con: pip install flask")
-        time.sleep(2)
-        return
-
-    app = Flask(__name__)
-
-    @app.route("/")
-    def home():
-        return """
-        <html>
-        <body style='background:black;color:#7df9ff;font-family:Consolas;text-align:center;'>
-            <h1>SPINELLY HUB — WEB</h1>
-            <button onclick="alert('Main')" style="padding:10px;margin:10px;">Main</button>
-            <button onclick="alert('PvP')" style="padding:10px;margin:10px;">PvP</button>
-            <br><br>
-            <a href="https://discord.gg/" style="color:#5865F2;">Discord</a>
-        </body>
-        </html>
-        """
-
-    print("Iniciando servidor en http://127.0.0.1:5000 ...")
-    app.run(port=5000)
-
-
-# ================================================================
-# ========================= MENÚ GLOBAL ==========================
-# ================================================================
-
-def main_menu():
-    while True:
-        titulo_animado()
-        print(f"""
-{MAGENTA}SPINELLY HUB — ULTRA SCRIPT{RESET}
-
-1) Terminal futurista
-2) GUI (ventana)
-3) Web App
-4) Modo Matrix
-D) Discord
-X) Salir
-""")
-
-        op = input("Selecciona: ").lower()
-
-        if op == "1":
-            terminal_menu()
-        elif op == "2":
-            gui_mode()
-        elif op == "3":
-            web_mode()
-        elif op == "4":
-            matrix_mode()
-        elif op == "d":
-            webbrowser.open("https://discord.gg/")
-        elif op == "x":
-            clear()
-            glitch("Cerrando Spinelly Hub...")
-            time.sleep(1)
-            break
-
-
-if __name__ == "__main__":
-    main_menu()
+-- Botón cerrar
+crearBoton("Cerrar Hub", 330, function()
+	screenGui:Destroy()
+end)
