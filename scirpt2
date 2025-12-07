@@ -1,0 +1,120 @@
+import time
+import os
+import random
+import webbrowser
+
+# ===== COLORES =====
+RESET = "\033[0m"
+BOLD = "\033[1m"
+CYAN = "\033[96m"
+MAGENTA = "\033[95m"
+BLUE = "\033[94m"
+GREEN = "\033[92m"
+RED = "\033[91m"
+
+# ===== LIMPIAR PANTALLA =====
+def clear():
+    os.system("cls" if os.name == "nt" else "clear")
+
+# ===== EFECTO GLITCH DIGITAL =====
+def glitch(texto):
+    chars = list(texto)
+    for _ in range(8):
+        corrupto = "".join(
+            c if random.random() > 0.15 else random.choice("@#$%&/+=*")
+            for c in chars
+        )
+        print(MAGENTA + corrupto + RESET, end="\r")
+        time.sleep(0.05)
+    print(CYAN + texto + RESET)
+
+# ===== ANIMACIÓN HOLOGRAMA =====
+def animacion_titulo():
+    clear()
+    titulo = "SPINELLY HUB"
+
+    print("\n\n")
+    print(BLUE + "    Inicializando Holograma..." + RESET)
+    time.sleep(0.7)
+
+    for i in range(3):
+        print(BLUE + "    Generando Partículas ▮" + "▮" * i + RESET)
+        time.sleep(0.3)
+
+    print("\n      ", end="")
+    glitch(titulo)
+    print("\n")
+    time.sleep(0.4)
+
+# ===== EFECTO DE CARGA FUTURISTA =====
+def carga(texto="Cargando"):
+    print(MAGENTA + texto + "…" + RESET)
+    for i in range(20):
+        bar = "▮" * i
+        print(CYAN + "[" + bar.ljust(20) + "]" + RESET, end="\r")
+        time.sleep(0.05)
+    print()
+
+# ===== LOGO DISCORD (FIJO) =====
+def discord_icon():
+    print(BLUE + "🟦 Discord: presiona [D]" + RESET)
+
+# ===== PANTALLAS OPCIONALES =====
+def pantalla_generica(nombre):
+    clear()
+    animacion_titulo()
+    titulo = f"— {nombre} —"
+    glitch(titulo)
+    carga(f"Inicializando {nombre}")
+    print(GREEN + f"\n{nombre} está listo.\n" + RESET)
+    input("Presiona Enter para volver al menú...")
+
+# ===== MENÚ PRINCIPAL =====
+def menu():
+    while True:
+        clear()
+        animacion_titulo()
+
+        print(f"""
+{MAGENTA}{BOLD}╔════════════════════════════════════════╗
+║           ⚡ MENÚ PRINCIPAL ⚡           ║
+╠════════════════════════════════════════╣{RESET}
+
+   {CYAN}[1]{RESET} Main
+   {CYAN}[2]{RESET} PvP
+   {CYAN}[3]{RESET} Laser Lagger
+   {CYAN}[4]{RESET} ZZZ
+
+   {BLUE}[D]{RESET} Conectar a Discord
+   {RED}[X]{RESET} Salir
+""")
+        discord_icon()
+        print()
+
+        opcion = input("Selecciona una opción: ").strip().lower()
+
+        if opcion == "1":
+            pantalla_generica("MAIN")
+        elif opcion == "2":
+            pantalla_generica("PvP MODE")
+        elif opcion == "3":
+            pantalla_generica("LASER LAGGER")
+        elif opcion == "4":
+            pantalla_generica("ZZZ MODE")
+        elif opcion == "d":
+            print(BLUE + "Abriendo Discord…" + RESET)
+            webbrowser.open("https://discord.gg/")  # <-- pon tu link
+            time.sleep(1.5)
+        elif opcion == "x":
+            clear()
+            glitch("Cerrando Spinelly Hub...")
+            time.sleep(1)
+            break
+        else:
+            print(RED + "❌ Opción no válida" + RESET)
+            time.sleep(1)
+
+# ===== EJECUCIÓN =====
+if __name__ == "__main__":
+    animacion_titulo()
+    menu()
