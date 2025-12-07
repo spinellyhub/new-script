@@ -1,4 +1,5 @@
 local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
 local player = Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
 
@@ -24,11 +25,14 @@ local function Neon(obj, color)
 	end)
 end
 
+-- Variables para controlar menú y submenús
 local menuAbierto = true
 local subMenuAbierto = nil
 local titleAnimado = false
 
--- Menú principal
+-- =======================
+-- Crear frame principal
+-- =======================
 local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0, 500, 0, 550)
 frame.Position = UDim2.new(0.5, 0, 0.5, 0)
@@ -46,7 +50,9 @@ frameCorner.Parent = frame
 
 Neon(frame, Color3.fromRGB(200, 150, 255))
 
--- Título
+-- =======================
+-- Título animado
+-- =======================
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, 0, 0, 60)
 title.Position = UDim2.new(0, 0, 0, 10)
@@ -59,28 +65,29 @@ title.TextStrokeColor3 = Color3.new(0, 0, 0)
 title.TextStrokeTransparency = 0.5
 title.Parent = frame
 
--- Animación del título
-if not titleAnimado then
-	titleAnimado = true
-	spawn(function()
-		local fullTitle = "SPINELLY HUB"
-		for i = 1, #fullTitle do
-			local glitch = ""
-			for j = 1, i do
-				if math.random(1, 4) == 1 then
-					glitch = glitch .. string.char(math.random(33, 126))
-				else
-					glitch = glitch .. fullTitle:sub(j, j)
-				end
+local function animarTitulo()
+	local fullTitle = "SPINELLY HUB"
+	for i = 1, #fullTitle do
+		local glitch = ""
+		for j = 1, i do
+			if math.random(1, 4) == 1 then
+				glitch = glitch .. string.char(math.random(33, 126))
+			else
+				glitch = glitch .. fullTitle:sub(j, j)
 			end
-			title.Text = glitch
-			task.wait(0.07)
 		end
-		title.Text = fullTitle
-	end)
+		title.Text = glitch
+		task.wait(0.07)
+	end
+	title.Text = fullTitle
 end
 
+-- Ejecutar animación título solo una vez al abrir el menú
+animarTitulo()
+
+-- =======================
 -- Botón cerrar/minimizar
+-- =======================
 local closeBtn = Instance.new("TextButton")
 closeBtn.Size = UDim2.new(0, 30, 0, 30)
 closeBtn.Position = UDim2.new(1, -35, 0, 5)
@@ -96,7 +103,9 @@ local closeBtnCorner = Instance.new("UICorner")
 closeBtnCorner.CornerRadius = UDim.new(0, 6)
 closeBtnCorner.Parent = closeBtn
 
--- Botón “S” morado para restaurar, ahora movible
+-- =======================
+-- Botón "S" morado movible para restaurar
+-- =======================
 local miniBtn = Instance.new("TextButton")
 miniBtn.Size = UDim2.new(0, 50, 0, 50)
 miniBtn.Position = UDim2.new(0, 50, 1, -70)
@@ -136,7 +145,7 @@ miniBtn.InputChanged:Connect(function(input)
 	end
 end)
 
-game:GetService("UserInputService").InputChanged:Connect(function(input)
+UserInputService.InputChanged:Connect(function(input)
 	if input == dragInput and dragging then
 		local delta = input.Position - dragStart
 		local newPos = UDim2.new(
@@ -149,25 +158,9 @@ game:GetService("UserInputService").InputChanged:Connect(function(input)
 	end
 end)
 
-closeBtn.MouseButton1Click:Connect(function()
-	frame.Visible = false
-	miniBtn.Visible = true
-	menuAbierto = false
-
-	-- Al minimizar, cerrar submenú si existe
-	if subMenuAbierto then
-		subMenuAbierto:Destroy()
-		subMenuAbierto = nil
-	end
-end)
-
-miniBtn.MouseButton1Click:Connect(function()
-	frame.Visible = true
-	miniBtn.Visible = false
-	menuAbierto = true
-end)
-
--- Función para crear interruptor con animación (deslizante)
+-- =======================
+-- Función para crear interruptor toggle con animación
+-- =======================
 local function crearInterruptor(parent, y, nombre, callback)
 	local lbl = Instance.new("TextLabel")
 	lbl.Size = UDim2.new(0, 180, 0, 40)
@@ -239,12 +232,15 @@ local function crearInterruptor(parent, y, nombre, callback)
 	actualizar()
 end
 
--- Función para crear submenú
+-- =======================
+-- Crear submenú
+-- =======================
 local function crearSubmenu(titulo, opciones)
 	if subMenuAbierto then
 		subMenuAbierto:Destroy()
 		subMenuAbierto = nil
 	end
+
 	local sub = Instance.new("Frame")
 	sub.Size = UDim2.new(0, 320, 0, 60 + #opciones * 50)
 	sub.Position = UDim2.new(0.5, -160, 0.5, -30 - (#opciones * 25))
@@ -298,7 +294,9 @@ local function crearSubmenu(titulo, opciones)
 	subMenuAbierto = sub
 end
 
--- Función crear botón principal
+-- =======================
+-- Crear botones principales
+-- =======================
 local function crearBoton(nombre, y, opciones)
 	local btn = Instance.new("TextButton")
 	btn.Size = UDim2.new(0, 240, 0, 45)
@@ -336,7 +334,9 @@ local function crearBoton(nombre, y, opciones)
 	end)
 end
 
--- Opciones con callbacks reales (puedes ajustar las funciones a lo que quieras que hagan)
+-- =======================
+-- Opciones y callbacks
+-- =======================
 local opcionesMain = {
 	{nombre = "Speed Boost", callback = function(state) print("Speed Boost:", state) end},
 	{nombre = "Jump Boost", callback = function(state) print("Jump Boost:", state) end}
@@ -361,7 +361,9 @@ crearBoton("PvP", 160, opcionesPvP)
 crearBoton("Laser Lagger", 220, opcionesLaser)
 crearBoton("ZZZ", 280, opcionesZZZ)
 
--- Botón Discord redondo
+-- =======================
+-- Botón Discord redondo abajo a la derecha
+-- =======================
 local discordBtn = Instance.new("ImageButton")
 discordBtn.Size = UDim2.new(0, 50, 0, 50)
 discordBtn.Position = UDim2.new(1, -60, 1, -60)
@@ -377,4 +379,25 @@ Neon(discordBtn, Color3.fromRGB(200, 150, 255))
 
 discordBtn.MouseButton1Click:Connect(function()
 	setclipboard("https://discord.gg/SB5AFaA5uW")
+end)
+
+-- =======================
+-- Lógica cerrar / minimizar y restaurar menú
+-- =======================
+closeBtn.MouseButton1Click:Connect(function()
+	frame.Visible = false
+	miniBtn.Visible = true
+	menuAbierto = false
+
+	-- Cerrar submenú si está abierto
+	if subMenuAbierto then
+		subMenuAbierto:Destroy()
+		subMenuAbierto = nil
+	end
+end)
+
+miniBtn.MouseButton1Click:Connect(function()
+	frame.Visible = true
+	miniBtn.Visible = false
+	menuAbierto = true
 end)
