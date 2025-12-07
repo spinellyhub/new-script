@@ -96,7 +96,7 @@ local closeBtnCorner = Instance.new("UICorner")
 closeBtnCorner.CornerRadius = UDim.new(0, 6)
 closeBtnCorner.Parent = closeBtn
 
--- Botón “S” morado para restaurar
+-- Botón “S” morado para restaurar, ahora movible
 local miniBtn = Instance.new("TextButton")
 miniBtn.Size = UDim2.new(0, 50, 0, 50)
 miniBtn.Position = UDim2.new(0, 50, 1, -70)
@@ -113,10 +113,52 @@ local miniCorner = Instance.new("UICorner")
 miniCorner.CornerRadius = UDim.new(0, 25)
 miniCorner.Parent = miniBtn
 
+-- Hacer botón mini movible
+local dragging = false
+local dragInput, dragStart, startPos
+
+miniBtn.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = miniBtn.Position
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+miniBtn.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement then
+		dragInput = input
+	end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+	if input == dragInput and dragging then
+		local delta = input.Position - dragStart
+		local newPos = UDim2.new(
+			math.clamp(startPos.X.Scale, 0, 1),
+			math.clamp(startPos.X.Offset + delta.X, 0, workspace.CurrentCamera.ViewportSize.X - miniBtn.AbsoluteSize.X),
+			math.clamp(startPos.Y.Scale, 0, 1),
+			math.clamp(startPos.Y.Offset + delta.Y, 0, workspace.CurrentCamera.ViewportSize.Y - miniBtn.AbsoluteSize.Y)
+		)
+		miniBtn.Position = newPos
+	end
+end)
+
 closeBtn.MouseButton1Click:Connect(function()
 	frame.Visible = false
 	miniBtn.Visible = true
 	menuAbierto = false
+
+	-- Al minimizar, cerrar submenú si existe
+	if subMenuAbierto then
+		subMenuAbierto:Destroy()
+		subMenuAbierto = nil
+	end
 end)
 
 miniBtn.MouseButton1Click:Connect(function()
@@ -294,31 +336,37 @@ local function crearBoton(nombre, y, opciones)
 	end)
 end
 
--- Crear botones principales con sus opciones
-crearBoton("Main", 100, {
-	{name = "Speed Boost", callback = function(state) print("Speed Boost:", state) end},
-	{name = "Jump Boost", callback = function(state) print("Jump Boost:", state) end}
-})
+-- Opciones con callbacks reales (puedes ajustar las funciones a lo que quieras que hagan)
+local opcionesMain = {
+	{nombre = "Speed Boost", callback = function(state) print("Speed Boost:", state) end},
+	{nombre = "Jump Boost", callback = function(state) print("Jump Boost:", state) end}
+}
 
-crearBoton("PvP", 160, {
-	{name = "Auto Hit", callback = function(state) print("Auto Hit:", state) end},
-	{name = "Auto Medusa", callback = function(state) print("Auto Medusa:", state) end}
-})
+local opcionesPvP = {
+	{nombre = "Auto Hit", callback = function(state) print("Auto Hit:", state) end},
+	{nombre = "Auto Medusa", callback = function(state) print("Auto Medusa:", state) end}
+}
 
-crearBoton("Laser Lagger", 220, {
-	{name = "Activar Laser", callback = function(state) print("Laser Lagger:", state) end}
-})
+local opcionesLaser = {
+	{nombre = "Activar Laser", callback = function(state) print("Laser Lagger:", state) end}
+}
 
-crearBoton("ZZZ", 280, {
-	{name = "Activar ZZZ", callback = function(state) print("ZZZ:", state) end}
-})
+local opcionesZZZ = {
+	{nombre = "Activar ZZZ", callback = function(state) print("ZZZ:", state) end}
+}
+
+-- Crear botones principales con opciones
+crearBoton("Main", 100, opcionesMain)
+crearBoton("PvP", 160, opcionesPvP)
+crearBoton("Laser Lagger", 220, opcionesLaser)
+crearBoton("ZZZ", 280, opcionesZZZ)
 
 -- Botón Discord redondo
 local discordBtn = Instance.new("ImageButton")
 discordBtn.Size = UDim2.new(0, 50, 0, 50)
 discordBtn.Position = UDim2.new(1, -60, 1, -60)
 discordBtn.BackgroundTransparency = 1
-discordBtn.Image = "rbxassetid://9069883411" -- Logo Discord
+discordBtn.Image = "rbxassetid://9069883411" -- Logo Discord oficial
 discordBtn.Parent = frame
 
 local discordCorner = Instance.new("UICorner")
