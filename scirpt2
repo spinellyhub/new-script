@@ -1,128 +1,194 @@
--- SPINELLY HUB LUA (XENO COMPATIBLE)
--- Menú visual completo inspirado en tu script Python
+-- SPINELLY HUB 4.0 — LUA ULTRA FUTURISTA
+-- Con sonido holográfico, transiciones y panel lateral
 
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
 
--- Limpiar GUI anterior
+-- Limpia GUI previo
 if PlayerGui:FindFirstChild("SpinellyHub") then
-	PlayerGui:FindFirstChild("SpinellyHub"):Destroy()
+	PlayerGui.SpinellyHub:Destroy()
 end
 
 -- Crear ScreenGui
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "SpinellyHub"
-screenGui.ResetOnSpawn = false
-screenGui.Parent = PlayerGui
+local gui = Instance.new("ScreenGui")
+gui.Name = "SpinellyHub"
+gui.ResetOnSpawn = false
+gui.Parent = PlayerGui
 
--- Fondo principal
-local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 400, 0, 500)
-frame.Position = UDim2.new(0.5, -200, 0.5, -250)
-frame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
-frame.BorderSizePixel = 0
-frame.Parent = screenGui
-
--- Fondo Matrix opcional
-local matrixFrame = Instance.new("Frame")
-matrixFrame.Size = UDim2.new(1,0,1,0)
-matrixFrame.BackgroundTransparency = 1
-matrixFrame.Parent = frame
-
-local matrixText = Instance.new("TextLabel")
-matrixText.Size = UDim2.new(1,0,1,0)
-matrixText.Position = UDim2.new(0,0,0,0)
-matrixText.BackgroundTransparency = 1
-matrixText.Font = Enum.Font.Code
-matrixText.TextSize = 14
-matrixText.TextColor3 = Color3.fromRGB(0, 255, 70)
-matrixText.Text = ""
-matrixText.TextXAlignment = Enum.TextXAlignment.Left
-matrixText.TextYAlignment = Enum.TextYAlignment.Top
-matrixText.Parent = matrixFrame
-
--- Animación tipo Matrix
-spawn(function()
-	local chars = "01"
-	while true do
-		local line = ""
-		for i=1,150 do
-			line = line .. string.sub(chars, math.random(1,#chars), math.random(1,#chars))
+-- ============================================
+-- Función NEÓN animado
+-- ============================================
+local function Neon(obj, color)
+	local glow = Instance.new("UIGradient")
+	glow.Color = ColorSequence.new{ColorSequenceKeypoint.new(0,color), ColorSequenceKeypoint.new(1,color)}
+	glow.Rotation = 90
+	glow.Parent = obj
+	spawn(function()
+		while task.wait(0.02) do
+			glow.Rotation = glow.Rotation + 1
 		end
-		matrixText.Text = line
-		wait(0.02)
+	end)
+end
+
+-- ============================================
+-- Fondo principal
+-- ============================================
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0,500,0,550)
+frame.Position = UDim2.new(0.5,-250,0.5,-275)
+frame.BackgroundColor3 = Color3.fromRGB(5,5,5)
+frame.BorderSizePixel = 0
+frame.Parent = gui
+Neon(frame, Color3.fromRGB(0,255,255))
+
+-- ============================================
+-- Panel lateral plegable
+-- ============================================
+local panel = Instance.new("Frame")
+panel.Size = UDim2.new(0,150,1,0)
+panel.Position = UDim2.new(0, -150,0,0)
+panel.BackgroundColor3 = Color3.fromRGB(10,10,30)
+panel.BorderSizePixel = 0
+panel.Parent = frame
+Neon(panel, Color3.fromRGB(255,0,255))
+
+-- Botón de abrir/cerrar panel
+local toggleBtn = Instance.new("TextButton")
+toggleBtn.Size = UDim2.new(0,30,0,100)
+toggleBtn.Position = UDim2.new(0,150,0,10)
+toggleBtn.Text = "☰"
+toggleBtn.Font = Enum.Font.Code
+toggleBtn.TextSize = 28
+toggleBtn.TextColor3 = Color3.fromRGB(255,0,255)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(20,20,20)
+toggleBtn.BorderSizePixel = 0
+toggleBtn.Parent = frame
+
+local panelOpen = false
+toggleBtn.MouseButton1Click:Connect(function()
+	panelOpen = not panelOpen
+	if panelOpen then
+		panel:TweenPosition(UDim2.new(0,0,0,0),"Out","Quad",0.4,true)
+	else
+		panel:TweenPosition(UDim2.new(0,-150,0,0),"Out","Quad",0.4,true)
 	end
 end)
 
--- Título animado
+-- ============================================
+-- Fondo Matrix
+-- ============================================
+local matrix = Instance.new("TextLabel")
+matrix.Size = UDim2.new(1,0,1,0)
+matrix.BackgroundTransparency = 1
+matrix.TextColor3 = Color3.fromRGB(0,255,70)
+matrix.Font = Enum.Font.Code
+matrix.TextSize = 14
+matrix.TextXAlignment = Enum.TextXAlignment.Left
+matrix.TextYAlignment = Enum.TextYAlignment.Top
+matrix.Text = ""
+matrix.Parent = frame
+
+spawn(function()
+	while true do
+		local s=""
+		for i=1,400 do
+			s = s .. tostring(math.random(0,1))
+		end
+		matrix.Text = s
+		task.wait(0.03)
+	end
+end)
+
+-- ============================================
+-- TÍTULO GLITCH + SONIDO HOLOGRÁFICO
+-- ============================================
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 50)
+title.Size = UDim2.new(1,0,0,60)
 title.Position = UDim2.new(0,0,0,10)
 title.BackgroundTransparency = 1
-title.TextColor3 = Color3.fromRGB(125, 249, 255)
+title.TextColor3 = Color3.fromRGB(0,255,255)
 title.Font = Enum.Font.Code
-title.TextSize = 32
+title.TextSize = 36
 title.Text = ""
 title.Parent = frame
 
 local fullTitle = "SPINELLY HUB"
-local index = 0
+
 spawn(function()
-	while index <= #fullTitle do
-		title.Text = string.sub(fullTitle,1,index)
-		index = index + 1
-		wait(0.07)
+	for i=1,#fullTitle do
+		local glitch = ""
+		for j=1,i do
+			if math.random(1,4)==1 then
+				glitch = glitch .. string.char(math.random(33,126))
+			else
+				glitch = glitch .. fullTitle:sub(j,j)
+			end
+		end
+		title.Text = glitch
+		-- Sonido holográfico (beep simulado)
+		local beep = Instance.new("Sound",frame)
+		beep.SoundId = "rbxassetid://911882175" -- beep corto
+		beep.Volume = 0.3
+		beep:Play()
+		task.wait(0.07)
 	end
+	title.Text = fullTitle
 end)
 
--- Función para crear botones
-local function crearBoton(nombre, y, func)
+-- ============================================
+-- Función para crear botones futuristas
+-- ============================================
+local function crearBoton(nombre, y, callback)
 	local btn = Instance.new("TextButton")
-	btn.Size = UDim2.new(0, 200, 0, 40)
-	btn.Position = UDim2.new(0.5, -100, 0, y)
-	btn.BackgroundColor3 = Color3.fromRGB(40,40,40)
-	btn.TextColor3 = Color3.fromRGB(125,249,255)
+	btn.Size = UDim2.new(0,240,0,45)
+	btn.Position = UDim2.new(0.5,-120,0,y)
+	btn.BackgroundColor3 = Color3.fromRGB(20,20,20)
+	btn.TextColor3 = Color3.fromRGB(0,255,255)
+	btn.Text = nombre
 	btn.Font = Enum.Font.Code
 	btn.TextSize = 22
-	btn.Text = nombre
 	btn.Parent = frame
-	btn.MouseButton1Click:Connect(func)
+
+	Neon(btn, Color3.fromRGB(0,255,255))
+
+	-- Hover animación
+	btn.MouseEnter:Connect(function()
+		btn.TextColor3 = Color3.fromRGB(255,255,255)
+		btn:TweenSize(UDim2.new(0,260,0,50),"Out","Quad",0.2,true)
+	end)
+	btn.MouseLeave:Connect(function()
+		btn.TextColor3 = Color3.fromRGB(0,255,255)
+		btn:TweenSize(UDim2.new(0,240,0,45),"Out","Quad",0.2,true)
+	end)
+
+	btn.MouseButton1Click:Connect(function()
+		-- Transición suave al entrar al modo
+		local overlay = Instance.new("Frame")
+		overlay.Size = UDim2.new(1,0,1,0)
+		overlay.Position = UDim2.new(0,0,0,0)
+		overlay.BackgroundColor3 = Color3.fromRGB(0,255,255)
+		overlay.BackgroundTransparency = 0.7
+		overlay.Parent = frame
+		overlay:TweenSizeAndPosition(UDim2.new(0,0,0,0),UDim2.new(0.5,0,0.5,0),"Out","Quad",0.4,true,function()
+			overlay:Destroy()
+		end)
+		callback()
+	end)
 end
 
--- Barra de carga simulada
-local barra = Instance.new("Frame")
-barra.Size = UDim2.new(0,0,0,10)
-barra.Position = UDim2.new(0,0,0,450)
-barra.BackgroundColor3 = Color3.fromRGB(125,249,255)
-barra.Parent = frame
+-- ============================================
+-- BOTONES PRINCIPALES
+-- ============================================
 
-spawn(function()
-	for i=1,400 do
-		barra.Size = UDim2.new(0,i,0,10)
-		wait(0.01)
-	end
+crearBoton("Main", 100, function() title.Text = "MAIN MODE" end)
+crearBoton("PvP", 160, function() title.Text = "PVP MODE" end)
+crearBoton("Laser Lagger", 220, function() title.Text = "LASER LAGGER" end)
+crearBoton("ZZZ", 280, function() title.Text = "ZZZ MODE" end)
+crearBoton("Discord", 340, function()
+	setclipboard("https://discord.gg/")
+	title.Text = "DISCORD COPIED!"
 end)
-
--- Botones principales
-crearBoton("Main", 80, function()
-	title.Text = "Main"
-end)
-crearBoton("PvP", 130, function()
-	title.Text = "PvP"
-end)
-crearBoton("Laser Lagger", 180, function()
-	title.Text = "Laser Lagger"
-end)
-crearBoton("ZZZ", 230, function()
-	title.Text = "ZZZ"
-end)
-crearBoton("Discord", 280, function()
-	setclipboard("https://discord.gg/") -- copia al portapapeles
-	title.Text = "Discord copiado al portapapeles!"
-end)
-
--- Botón cerrar
-crearBoton("Cerrar Hub", 330, function()
-	screenGui:Destroy()
+crearBoton("Cerrar Hub", 400, function()
+	gui:Destroy()
 end)
